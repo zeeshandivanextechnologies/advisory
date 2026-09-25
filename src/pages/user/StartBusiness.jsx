@@ -1,3 +1,4 @@
+import { FiCheck } from 'react-icons/fi';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
@@ -174,7 +175,7 @@ export default function StartBusiness() {
         <div key={n} className="step-item">
           
           <div className={`step-circle ${isDone ? 'done' : isActive ? 'active' : 'pending'}`}>
-            {isDone ? '✓' : n}
+            {isDone ? <FiCheck /> : n}
           </div>
 
           <span className="step-label">

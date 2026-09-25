@@ -1,3 +1,4 @@
+import { FiAlertTriangle, FiFolder } from 'react-icons/fi';
 import React, { useState, useEffect, useRef, useCallback, Component } from 'react';
 import { FaSearch } from 'react-icons/fa';
 
@@ -24,7 +25,7 @@ export class ErrorBoundary extends Component {
           justifyContent: 'center', minHeight: '60vh', padding: 40,
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+          <div style={{ fontSize: 48, marginBottom: 16 }}><FiAlertTriangle /></div>
           <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, color: 'var(--text-dark)' }}>
             Something went wrong
           </h2>
@@ -226,7 +227,7 @@ export const SearchInput = ({ value, onChange, placeholder = 'Search…', style 
 );
 
 /* ── Empty State ──────────────────────────────────────────── */
-export const EmptyState = ({ icon = '📂', title = 'Nothing here', text = '' }) => (
+export const EmptyState = ({ icon = <FiFolder />, title = 'Nothing here', text = '' }) => (
   <div className="empty-state">
     <div className="empty-state-icon mb-0">{icon}</div>
     <h4>{title}</h4>

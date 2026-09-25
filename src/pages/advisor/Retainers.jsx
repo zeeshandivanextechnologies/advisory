@@ -1,3 +1,4 @@
+import { FiClock } from 'react-icons/fi';
 import React, { useState, useEffect, useCallback } from 'react';
 import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, EmptyState, showToast } from '../../components/common/index';
@@ -71,7 +72,7 @@ export default function AdvisorRetainers() {
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={6}><EmptyState icon="⏱️" title="No retainer clients" text="Retainers assigned to you by the admin appear here" /></td></tr>
+                  <tr><td colSpan={6}><EmptyState icon={<FiClock />} title="No retainer clients" text="Retainers assigned to you by the admin appear here" /></td></tr>
                 )}
               </tbody>
             </table>

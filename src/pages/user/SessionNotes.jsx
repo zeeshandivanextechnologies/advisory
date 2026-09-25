@@ -1,3 +1,4 @@
+import { FaStar } from 'react-icons/fa';
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
@@ -119,7 +120,7 @@ export default function SessionNotes() {
                         color: i <= (hovered || rating) ? '#F59E0B' : '#D1D5DB',
                         transition: 'color 0.1s',
                       }}
-                    >★</button>
+                    ><FaStar /></button>
                   ))}
                 </div>
 

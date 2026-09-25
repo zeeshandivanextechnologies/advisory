@@ -1,3 +1,4 @@
+import { FiArrowRight, FiClock, FiInbox } from 'react-icons/fi';
 import React, { useState, useEffect, useCallback } from 'react';
 import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, EmptyState, SearchInput, Pagination, Modal, showToast } from '../../components/common/index';
@@ -97,7 +98,7 @@ function RequestsTab({ onRetainerCreated }) {
                     <td><button className="thm-btn" onClick={() => setEdit({ ...r })}>Manage</button></td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={7}><EmptyState icon="📥" title="No requests" text="Service requests from clients appear here" /></td></tr>
+                  <tr><td colSpan={7}><EmptyState icon={<FiInbox />} title="No requests" text="Service requests from clients appear here" /></td></tr>
                 )}
               </tbody>
             </table>
@@ -361,7 +362,7 @@ function RetainersTab({ reloadKey }) {
                     <td>{money(r.monthly_fee, r.currency)} / mo</td>
                     <td>
                       <div className="plan-table-content">
-                        <h5>{fmtDate(r.start_date)} →</h5>
+                        <h5>{fmtDate(r.start_date)} <FiArrowRight style={{ verticalAlign: '-2px' }} /></h5>
                         <p>{r.end_date ? `Ends ${fmtDate(r.end_date)}` : `Min. until ${fmtDate(r.min_term_end)}`}</p>
                       </div>
                     </td>
@@ -375,7 +376,7 @@ function RetainersTab({ reloadKey }) {
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={7}><EmptyState icon="⏱️" title="No retainers yet" text="Start one from a retainer request or create it here" /></td></tr>
+                  <tr><td colSpan={7}><EmptyState icon={<FiClock />} title="No retainers yet" text="Start one from a retainer request or create it here" /></td></tr>
                 )}
               </tbody>
             </table>

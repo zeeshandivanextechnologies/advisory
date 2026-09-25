@@ -1,3 +1,4 @@
+import { FiCheckCircle } from 'react-icons/fi';
 // export { Contact as default } from './PublicPages';
 
 
@@ -88,7 +89,7 @@ function Contact() {
               <div className="contact-form-wrapper">
                 {sent ? (
                   <div className="contact-success text-center">
-                    <div className="success-icon">✅</div>
+                    <div className="success-icon"><FiCheckCircle /></div>
                     <h3 className="success-title">Message Sent!</h3>
                     <p className="success-text">
                       We'll get back to you within 2 business hours.

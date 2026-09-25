@@ -1,3 +1,5 @@
+import { FaStar } from 'react-icons/fa';
+import { FiTarget } from 'react-icons/fi';
 import React, { useState, useEffect, useCallback } from 'react';
 import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, EmptyState, SearchInput, Pagination, showToast } from '../../components/common/index';
@@ -95,7 +97,7 @@ export default function AdminAdvisors() {
                     </td>
                     <td >{a.total_clients || 0}</td>
                     <td >
-                      ⭐ {Number(a.rating || 0).toFixed(1)}
+                      <FaStar style={{ color: '#F59E0B', verticalAlign: '-2px' }} /> {Number(a.rating || 0).toFixed(1)}
                     </td>
                     <td><Badge status={a.status} /></td>
                     <td>
@@ -122,7 +124,7 @@ export default function AdminAdvisors() {
                 )) : (
                   <tr>
                     <td colSpan={7}>
-                      <EmptyState icon="🎯" title="No advisors found" text="Try adjusting the search filters" />
+                      <EmptyState icon={<FiTarget />} title="No advisors found" text="Try adjusting the search filters" />
                     </td>
                   </tr>
                 )}

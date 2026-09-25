@@ -1,3 +1,4 @@
+import { FiCheck } from 'react-icons/fi';
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useSettings } from '../context/SettingsContext';
@@ -693,7 +694,7 @@ function Pricing() {
                   <ul className="aun-price-features">
                     {features.map(f => (
                       <li key={f} className="aun-price-item">
-                        <span className="aun-check">✓</span> {f}
+                        <span className="aun-check"><FiCheck /></span> {f}
                       </li>
                     ))}
 
@@ -821,7 +822,7 @@ function Testimonials() {
           </div>
           <div className='col-lg-4'>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px', background: '#FFF', border: '1px solid #EAEAEA', borderRadius: 'var(--radius)' }}>
-              <span style={{ color: '#C9A84C', letterSpacing: 2, fontSize: 14 }}>★★★★★</span>
+              <span style={{ color: '#C9A84C', fontSize: 14, display: 'inline-flex', gap: 2 }}>{[0, 1, 2, 3, 4].map(i => <FaStar key={i} />)}</span>
               <span style={{ fontSize: 13, color: '#6B7280' }}><strong style={{ color: '#000' }}>4.9/5</strong> from 200+ reviews</span>
             </div>
           </div>

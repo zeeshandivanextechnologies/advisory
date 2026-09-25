@@ -1,3 +1,4 @@
+import { FaStar } from 'react-icons/fa';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
@@ -12,7 +13,7 @@ const StarRating = ({ rating = 0, onRate }) => (
         key={i}
         onClick={() => onRate && onRate(i)}
         style={{ color: i <= rating ? '#F59E0B' : '#D1D5DB', fontSize: 14, cursor: onRate ? 'pointer' : 'default' }}
-      >★</span>
+      ><FaStar /></span>
     ))}
   </div>
 );
@@ -288,7 +289,7 @@ export default function Consultations() {
             <div style={{ display: 'flex', gap: 4 }}>
               {[1, 2, 3, 4, 5].map(i => (
                 <span key={i} onClick={() => setRatingModal(p => ({ ...p, rating: i }))}
-                  style={{ fontSize: 28, cursor: 'pointer', color: i <= ratingModal.rating ? '#F59E0B' : '#D1D5DB' }}>★</span>
+                  style={{ fontSize: 28, cursor: 'pointer', color: i <= ratingModal.rating ? '#F59E0B' : '#D1D5DB' }}><FaStar /></span>
               ))}
             </div>
           </div>

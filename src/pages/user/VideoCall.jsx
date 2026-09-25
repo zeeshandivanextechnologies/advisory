@@ -1,3 +1,6 @@
+import { FaBuilding } from 'react-icons/fa';
+import { FiAlertTriangle, FiMessageSquare, FiPhoneOff, FiSend, FiVideo } from 'react-icons/fi';
+import { GoDotFill } from 'react-icons/go';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { userAPI } from '../../services/api';
@@ -161,7 +164,7 @@ export default function VideoCall() {
   if (loading) return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1A1A1A' }}>
       <div style={{ textAlign: 'center', color: 'white' }}>
-        <div style={{ fontSize: 32, marginBottom: 16 }}>📹</div>
+        <div style={{ fontSize: 32, marginBottom: 16 }}><FiVideo /></div>
         <div style={{ fontSize: 16 }}>Preparing your session…</div>
       </div>
     </div>
@@ -170,7 +173,7 @@ export default function VideoCall() {
   if (error) return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1A1A1A' }}>
       <div style={{ textAlign: 'center', color: 'white', maxWidth: 400 }}>
-        <div style={{ fontSize: 32, marginBottom: 16 }}>⚠️</div>
+        <div style={{ fontSize: 32, marginBottom: 16 }}><FiAlertTriangle /></div>
         <div style={{ fontSize: 16, marginBottom: 8 }}>{error}</div>
         <button onClick={() => navigate('/user/consultations')}
           style={{ padding: '10px 24px', background: '#3B82F6', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 14 }}>
@@ -185,11 +188,11 @@ export default function VideoCall() {
       {/* Top Bar */}
       <div style={{ height: 52, background: '#111', borderBottom: '1px solid #2F343A', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontFamily: 'sans-serif', fontSize: 14, fontWeight: 700, color: 'white' }}>🏢 AunAdvisory</div>
+          <div style={{ fontFamily: 'sans-serif', fontSize: 14, fontWeight: 700, color: 'white' }}><FaBuilding style={{ marginRight: 6, verticalAlign: '-2px' }} />AunAdvisory</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {jitsiReady
-              ? <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', background: 'rgba(22,163,74,0.2)', color: '#16A34A', borderRadius: 4 }}>● Live Session</span>
-              : <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', background: 'rgba(234,179,8,0.2)', color: '#EAB308', borderRadius: 4 }}>● Connecting…</span>
+              ? <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', background: 'rgba(22,163,74,0.2)', color: '#16A34A', borderRadius: 4 }}><GoDotFill style={{ verticalAlign: '-2px' }} /> Live Session</span>
+              : <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', background: 'rgba(234,179,8,0.2)', color: '#EAB308', borderRadius: 4 }}><GoDotFill style={{ verticalAlign: '-2px' }} /> Connecting…</span>
             }
           </div>
         </div>
@@ -199,7 +202,7 @@ export default function VideoCall() {
             {formatElapsed(elapsed)}
           </span>
         )}
-        <ControlBtn icon="📞" danger onClick={handleEndCall} title="End Call" />
+        <ControlBtn icon={<FiPhoneOff color="#fff" />} danger onClick={handleEndCall} title="End Call" />
       </div>
 
       {/* Main Content */}
@@ -226,7 +229,7 @@ export default function VideoCall() {
             <>
               <div style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {messages.length === 0
-                  ? <div style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, marginTop: 40 }}>💬 Messages will appear here</div>
+                  ? <div style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, marginTop: 40 }}><FiMessageSquare style={{ verticalAlign: '-2px' }} /> Messages will appear here</div>
                   : messages.map(m => (
                     <div key={m.id} style={{ display: 'flex', gap: 10, flexDirection: m.from === 'user' ? 'row-reverse' : 'row', alignItems: 'flex-start' }}>
                       <div style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: m.from !== 'user' ? '#E0E7FF' : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700 }}>
@@ -247,7 +250,7 @@ export default function VideoCall() {
                   onChange={e => setMessage(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && sendMessage()}
                 />
-                <button onClick={sendMessage} style={{ width: 36, height: 36, borderRadius: '50%', background: '#111', border: 'none', cursor: 'pointer', color: 'white', fontSize: 14 }}>→</button>
+                <button onClick={sendMessage} style={{ width: 36, height: 36, borderRadius: '50%', background: '#111', border: 'none', cursor: 'pointer', color: 'white', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FiSend /></button>
               </div>
             </>
           ) : (

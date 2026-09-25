@@ -1,3 +1,4 @@
+import { FiAlertTriangle } from 'react-icons/fi';
 // export { Disclaimer as default } from './PublicPages';
 
 function Disclaimer() {
@@ -32,7 +33,7 @@ function Disclaimer() {
           </div>
 
           <div className="legal-warning-box">
-            <span className="warning-icon">⚠️</span>
+            <span className="warning-icon"><FiAlertTriangle /></span>
             <p>
               <strong>Important:</strong> AunAdvisory is an information and
               connection platform. Content on this platform does not constitute

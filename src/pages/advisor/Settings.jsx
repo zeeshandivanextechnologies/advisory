@@ -1,3 +1,4 @@
+import { FiCheck } from 'react-icons/fi';
 import React, { useState, useEffect } from 'react';
 import AppHeader from '../../components/layout/AppHeader';
 import { showToast, Spinner } from '../../components/common/index';
@@ -146,7 +147,7 @@ export default function AdvisorSettings() {
                       cursor: 'pointer', transition: 'all .15s',
                     }}
                   >
-                    {active ? '✓ ' : ''}{spec}
+                    {active ? <FiCheck style={{ marginRight: 4, verticalAlign: '-2px' }} /> : null}{spec}
                   </button>
                 );
               })}

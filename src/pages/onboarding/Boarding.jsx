@@ -1,3 +1,4 @@
+import { FaRocket } from 'react-icons/fa';
 import { useState } from 'react';
 import { Navigate, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -199,7 +200,7 @@ export default function Boarding() {
                     <div className='col-lg-4'>
                         <div className='onboarding-need-cards'>
                             <div className='onboarding-need-content'>
-                                <div style={{ fontSize: 52, marginBottom: 10 }}>🚀</div>
+                                <div style={{ fontSize: 52, marginBottom: 10 }}><FaRocket /></div>
                                 <h2>You're all set!</h2>
                                 <p >
                                     Your profile is complete. You can now connect with verified advisors, create cases, and upload documents — all in one place.

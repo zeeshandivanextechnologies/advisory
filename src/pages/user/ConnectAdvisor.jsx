@@ -1,3 +1,5 @@
+import { FiUser } from 'react-icons/fi';
+import { GoDotFill } from 'react-icons/go';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
@@ -299,7 +301,7 @@ export default function ConnectAdvisor() {
 
       <div className="pro-info">
         <span className={`pro-status ${available ? 'available' : 'busy'}`}>
-          {available ? '● Available Now' : 'Not Available'}
+          {available ? <><GoDotFill style={{ verticalAlign: '-2px' }} /> Available Now</> : 'Not Available'}
         </span>
       </div>
     </div>
@@ -374,7 +376,7 @@ export default function ConnectAdvisor() {
             
           </div>
         ) : (
-          <EmptyState icon="👤" title="No advisors found" text="Try a different search or category" />
+          <EmptyState icon={<FiUser />} title="No advisors found" text="Try a different search or category" />
         )}
       </div>
     </>

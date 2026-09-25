@@ -1,3 +1,5 @@
+import { FaHandshake } from 'react-icons/fa';
+import { FiCalendar, FiFileText } from 'react-icons/fi';
 import React, { useState, useEffect, useCallback } from 'react';
 import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, EmptyState, Modal, ConfirmModal, showToast } from '../../components/common/index';
@@ -93,7 +95,7 @@ function MembershipsTab() {
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={6}><EmptyState icon="🤝" title="No members yet" text="Membership is invite-only — invite founders and partners" /></td></tr>
+                  <tr><td colSpan={6}><EmptyState icon={<FaHandshake />} title="No members yet" text="Membership is invite-only — invite founders and partners" /></td></tr>
                 )}
               </tbody>
             </table>
@@ -200,7 +202,7 @@ function EventsTab() {
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={6}><EmptyState icon="📅" title="No events" text="Create an Integra Night, webinar or product demo" /></td></tr>
+                  <tr><td colSpan={6}><EmptyState icon={<FiCalendar />} title="No events" text="Create an Integra Night, webinar or product demo" /></td></tr>
                 )}
               </tbody>
             </table>
@@ -320,7 +322,7 @@ function BriefsTab() {
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={6}><EmptyState icon="📰" title="No briefs" text="Write the first Monthly Market Brief" /></td></tr>
+                  <tr><td colSpan={6}><EmptyState icon={<FiFileText />} title="No briefs" text="Write the first Monthly Market Brief" /></td></tr>
                 )}
               </tbody>
             </table>

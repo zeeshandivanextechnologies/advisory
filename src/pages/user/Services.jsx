@@ -1,3 +1,4 @@
+import { FiCheck, FiCompass, FiX } from 'react-icons/fi';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
@@ -10,7 +11,7 @@ import { FiClock, FiCalendar, FiDollarSign, FiCheckCircle } from 'react-icons/fi
 const statusText = (s) => REQUEST_STATUSES.find(x => x.value === s)?.label || s;
 
 const Check = ({ ok }) => (
-  <span style={{ color: ok ? '#10B981' : '#9CA3AF', fontSize: 14, flexShrink: 0 }}>{ok ? '✓' : '✕'}</span>
+  <span style={{ color: ok ? '#10B981' : '#9CA3AF', fontSize: 14, flexShrink: 0 }}>{ok ? <FiCheck /> : <FiX />}</span>
 );
 
 const ListBlock = ({ title, items, ok = true, limit }) => {
@@ -264,7 +265,7 @@ export default function Services() {
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={5}><EmptyState icon="🧭" title="No requests yet" text="Choose a service above to get started" /></td></tr>
+                  <tr><td colSpan={5}><EmptyState icon={<FiCompass />} title="No requests yet" text="Choose a service above to get started" /></td></tr>
                 )}
               </tbody>
             </table>

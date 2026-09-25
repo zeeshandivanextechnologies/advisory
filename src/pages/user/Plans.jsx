@@ -1,3 +1,4 @@
+import { FiCheck } from 'react-icons/fi';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
@@ -167,7 +168,7 @@ export default function Plans() {
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', flex: 1 }}>
                     {features.map((f, i) => (
                       <li key={i} style={{ fontSize: 14, fontWeight: 400, color: '#4A4949', padding: '6px 0', borderBottom: i < features.length - 1 ? '1px solid var(--border-light)' : 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ color: '#10B981', fontSize: 14 }}>✓</span> {f}
+                        <span style={{ color: '#10B981', fontSize: 14, display: 'inline-flex' }}><FiCheck /></span> {f}
                       </li>
                     ))}
                   </ul>

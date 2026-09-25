@@ -1,3 +1,4 @@
+import { FiLock } from 'react-icons/fi';
 import React, { useState, useEffect } from 'react';
 import AppHeader from '../../components/layout/AppHeader';
 import { Spinner, showToast } from '../../components/common/index';
@@ -256,7 +257,7 @@ export default function AdminSettings() {
                 </div>
                 {/* FIX: Secret key is NOT managed here — it's a server-side env var */}
                 <p style={{ fontSize: 14, fontWeight: 500, color: '#4A4949', padding: '0px 0', borderTop: '1px solid var(--border-light)', marginTop: 8 }}>
-                  🔒 Secret key is configured via the <code>STRIPE_SECRET_KEY</code> environment variable on the server — not stored here.
+                  <FiLock style={{ verticalAlign: '-2px' }} /> Secret key is configured via the <code>STRIPE_SECRET_KEY</code> environment variable on the server — not stored here.
                 </p>
               </div>
 
@@ -270,7 +271,7 @@ export default function AdminSettings() {
                   <input type="text" className="form-input" value={settings.tap_publishable_key || ''} onChange={e => set('tap_publishable_key', e.target.value)} placeholder="pk_test_..." />
                 </div>
                 <p style={{ fontSize: 14, fontWeight: 500, color: '#4A4949', padding: '0px 0', borderTop: '1px solid var(--border-light)', marginTop: 10 }}>
-                  🔒 Secret key is configured via the <code>TAP_SECRET_KEY</code> environment variable on the server — not stored here.
+                  <FiLock style={{ verticalAlign: '-2px' }} /> Secret key is configured via the <code>TAP_SECRET_KEY</code> environment variable on the server — not stored here.
                 </p>
               </div>
             </div>
