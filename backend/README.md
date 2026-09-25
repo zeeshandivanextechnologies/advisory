@@ -42,7 +42,8 @@ backend/
     │   ├── 0005_services_catalog.sql
     │   ├── 0006_client_journey_engagements.sql
     │   ├── 0007_sales_rules.sql
-    │   └── 0008_staffing_ai.sql
+    │   ├── 0008_staffing_ai.sql
+    │   └── 0009_deliverable_qa.sql
     ├── templates/            auth emails (6-digit signup code, password reset)
     └── seed.sql
 ```
@@ -181,6 +182,17 @@ All limits are in Admin → Settings → Sales Rules and are enforced by the dat
   - Proposal / SOW first draft, lead triage and reply draft, Monthly Market Brief research (with web search and sources), a 12-month financial-model scaffold, and checklist suggestions.
   - Every result is labelled as a draft for human review and logged in `ai_drafts`.
   - Requests use `claude-opus-5` with adaptive thinking, and use the server-side refusal fallback (`fallbacks: "default"`).
+
+### Deliverable QA (migration `0009`)
+No deliverable reaches a client without the QA checklist and an approval. The flow is **draft → in QA → approved → released**; changes requested returns it to the author.
+
+1. Staff (an admin or the assigned advisor) add a deliverable to an engagement, as a file, a link, or both.
+2. Submitting it seeds the document's 7-point QA checklist. The checklist is reset on every resubmission.
+3. Approval needs every item ticked, and must come from a **full admin or a founder**. The author cannot approve their own work unless they are a founder.
+4. Releasing it notifies and emails the client. Clients only ever see released deliverables and can download them. Storage access for clients is also limited to released files.
+5. A warning shows when QA finished less than 24 hours before release.
+
+The engagement-level "final delivery" QA gate from migration `0006` still applies.
 
 ### Endpoints (all under `/api`)
 Every response is `{ success, data }` (lists add `meta`) or `{ success:false, message }`. Protected endpoints need `Authorization: Bearer <token>`.

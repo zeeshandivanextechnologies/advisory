@@ -253,6 +253,16 @@ export const aiAPI = {
   checklist:      (caseId)       => api.post('/ai/checklist', { case_id: caseId }, aiTimeout),
 };
 
+/* ── Deliverables: QA checklist + approval before release ───── */
+export const deliverableAPI = {
+  list:     (engId)            => api.get(`/engagements/${engId}/deliverables`),
+  create:   (engId, fd)        => api.post(`/engagements/${engId}/deliverables`, fd),
+  update:   (id, data)         => api.put(`/deliverables/${id}`, data),
+  action:   (id, action, note) => api.post(`/deliverables/${id}/action`, { action, note }),
+  setQa:    (itemId, checked)  => api.put(`/deliverable-qa/${itemId}`, { checked }),
+  download: (id)               => api.get(`/deliverables/${id}/download`, { responseType: 'blob' }),
+};
+
 /* ── Public (no login needed) ──────────────────────────────── */
 export const publicAPI = {
   getSettings: ()     => api.get('/settings'),

@@ -108,3 +108,13 @@ exports.fridayNudge = ({ name, title, link }) => ({
   ].join('')),
   text: `${title} has no status update this week. Please post the weekly update.`,
 });
+
+exports.deliverableReleased = ({ name, engagement, title }) => ({
+  subject: `New deliverable: ${title}`,
+  html: layout('Your deliverable is ready', [
+    p(`Hi ${esc(name)},`),
+    p(`<b>${esc(title)}</b> for <b>${esc(engagement)}</b> has passed our quality check and is ready for you.`),
+    button(engagementsLink(), 'Open my engagements'),
+  ].join('')),
+  text: `${title} for ${engagement} is ready: ${engagementsLink()}`,
+});

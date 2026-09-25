@@ -15,6 +15,7 @@ const services = require('../controllers/services.controller');
 const journey = require('../controllers/journey.controller');
 const team = require('../controllers/team.controller');
 const aiDrafts = require('../controllers/ai.controller');
+const deliverables = require('../controllers/deliverables.controller');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: env.maxUploadBytes } });
 const router = Router();
@@ -120,6 +121,12 @@ router.put('/engagements/:id', h(journey.updateEngagement));
 router.post('/engagements/:id/qa', h(journey.addQaItem));
 router.put('/engagement-qa/:itemId', h(journey.setQaItem));
 router.post('/engagement-invoices/:id/pay', h(journey.payInvoiceOnline));
+router.get('/engagements/:id/deliverables', h(deliverables.list));
+router.post('/engagements/:id/deliverables', upload.single('file'), h(deliverables.create));
+router.put('/deliverables/:id', h(deliverables.update));
+router.post('/deliverables/:id/action', h(deliverables.action));
+router.put('/deliverable-qa/:itemId', h(deliverables.setQa));
+router.get('/deliverables/:id/download', h(deliverables.download));
 
 /* ── Staffing & AI drafts ────────────────────────────────── */
 router.get('/team/me', h(team.myScope));

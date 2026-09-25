@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge, Spinner, Modal, showToast } from '../common/index';
 import { journeyAPI, teamAPI } from '../../services/api';
 import { FinancialModelPanel } from './AiPanels';
+import DeliverablesPanel from './DeliverablesPanel';
 import { staffRoleLabel } from '../../utils/team';
 import EngagementStepper from './EngagementStepper';
 import { money, fmtDate, fmtDateTime } from '../../utils/services';
@@ -187,10 +188,18 @@ export default function EngagementManager({ engagementId, role, advisors = [], o
         <p style={{ fontSize: 13, color: '#4A4949', marginBottom: 0 }}>Completed {fmtDateTime(d.completed_at)}. Follow-ups are scheduled below.</p>
       )}
 
+      {/* Deliverables: QA checklist + approval before anything reaches the client */}
+      {!['awaiting_deposit', 'cancelled'].includes(d.status) && (
+        <>
+          <H>Deliverables & QA</H>
+          <DeliverablesPanel engagementId={d.id} mode="staff" />
+        </>
+      )}
+
       {/* QA checklist */}
       {d.qa_items?.length > 0 && (
         <>
-          <H>Pre-delivery QA checklist ({d.qa_done}/{d.qa_total})</H>
+          <H>Final delivery QA checklist ({d.qa_done}/{d.qa_total})</H>
           {d.qa_items.map(q => (
             <div key={q.id}
               onClick={() => !busy && qaOpen && act(() => journeyAPI.setQaItem(q.id, !q.is_checked))}

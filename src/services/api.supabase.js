@@ -345,6 +345,46 @@ export const aiAPI = {
   financialModel: aiUnavailable, checklist: aiUnavailable,
 };
 
+/* ── Deliverables: QA checklist + approval before release ───── */
+export const deliverableAPI = {
+  list: (engId) => rpc('api_deliverables', { p_engagement_id: Number(engId) }).then(ok),
+
+  // Same FormData as the REST version: title, description, link_url, optional file
+  create: async (engId, fd) => {
+    const file = fd.get('file');
+    let path = null;
+    if (file && file.size) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw toError('Not authenticated', 401);
+      path = `${user.id}/deliverables/${engId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${file.name.replace(/[^\w.-]+/g, '_')}`;
+      const { error } = await supabase.storage.from(DOCS_BUCKET).upload(path, file, { contentType: file.type || 'application/octet-stream' });
+      if (error) throw toError(error.message);
+    }
+    try {
+      return ok(await rpc('api_create_deliverable', {
+        p_engagement_id: Number(engId),
+        p: {
+          title: fd.get('title'), description: fd.get('description'), link_url: fd.get('link_url') || null,
+          file_path: path, file_name: file?.name || null, file_type: file?.type || null, file_size: file?.size || null,
+        },
+      }));
+    } catch (err) {
+      if (path) await supabase.storage.from(DOCS_BUCKET).remove([path]);
+      throw err;
+    }
+  },
+
+  update:   (id, data)         => rpc('api_update_deliverable', { p_id: Number(id), p: data }).then(ok),
+  action:   (id, action, note) => rpc('api_deliverable_action', { p_id: Number(id), p: { action, note } }).then(ok),
+  setQa:    (itemId, checked)  => rpc('api_set_deliverable_qa', { p_item_id: Number(itemId), p_checked: !!checked }).then(ok),
+  download: async (id) => {
+    const path = await rpc('api_deliverable_path', { p_id: Number(id) });
+    const { data, error } = await supabase.storage.from(DOCS_BUCKET).download(path);
+    if (error) throw toError(error.message);
+    return { data };
+  },
+};
+
 /* ── Public (no login needed) ──────────────────────────────── */
 export const publicAPI = {
   getSettings: ()     => rpc('api_public_settings').then(ok),

@@ -5,6 +5,7 @@ import { Badge, Spinner, EmptyState, Modal, showToast } from '../../components/c
 import { journeyAPI, subscriptionAPI } from '../../services/api';
 import { useSettings } from '../../context/SettingsContext';
 import EngagementStepper from '../../components/journey/EngagementStepper';
+import DeliverablesPanel from '../../components/journey/DeliverablesPanel';
 import { money, fmtDate } from '../../utils/services';
 import { PROPOSAL_LABELS, proposalBadge, ENGAGEMENT_LABELS, engagementBadge, invoiceBadge } from '../../utils/journey';
 import { FiFileText, FiExternalLink, FiCheck, FiX } from 'react-icons/fi';
@@ -130,6 +131,13 @@ export default function Engagements() {
                 <p style={{ fontSize: 13, color: '#4A4949' }}>Work begins as soon as the deposit is received.</p>
               )}
 
+              {!['awaiting_deposit', 'cancelled'].includes(e.status) && (
+                <div style={{ marginBottom: 14 }}>
+                  <h6 style={{ fontSize: 14, fontWeight: 600, color: '#000', marginBottom: 8 }}>Deliverables</h6>
+                  <DeliverablesPanel engagementId={e.id} mode="client" />
+                </div>
+              )}
+
               <h6 style={{ fontSize: 14, fontWeight: 600, color: '#000', marginBottom: 8 }}>Invoices</h6>
               {d?.invoices?.length ? (
                 <div className="table-responsive">
@@ -161,7 +169,7 @@ export default function Engagements() {
         })}
 
         {!openProposals.length && !engagements.length && (
-          <div className="advisor-legal-cards mb-3">
+          <div className="advisor-legal-cards mb-3 h-auto">
             <EmptyState icon={<FiFileText />} title="No engagements yet" text="Request a service and we will send you a proposal after the discovery call" />
           </div>
         )}

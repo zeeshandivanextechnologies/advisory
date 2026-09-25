@@ -6,7 +6,7 @@ const statusFromDbError = (err) => {
   const msg = err.message || '';
   if (/not authenticated/i.test(msg)) return 401;
   if (/under maintenance/i.test(msg)) return 503;
-  if (/suspended|permission|only the|does not have access/i.test(msg) || err.code === '42501') return 403;
+  if (/suspended|permission|only the|does not have access|only a founder|other than the author/i.test(msg) || err.code === '42501') return 403;
   if (/not found/i.test(msg)) return 404;
   if (err.code === 'P0001') return 400;
   if (err.code && /^22/.test(err.code)) return 400; // invalid input (bad number, date, uuid…)
