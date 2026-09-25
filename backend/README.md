@@ -29,13 +29,15 @@ backend/
 │   │   ├── auth.js           JWT sign/verify (requireAuth)
 │   │   └── errorHandler.js   maps errors → { success:false, message } + status
 │   ├── controllers/          one file per area (auth, users, advisors, cases, documents, admin, misc)
+│   ├── services/             mailer (nodemailer), email templates, signup codes / reset tokens
 │   ├── routes/index.js       every endpoint
 │   └── utils/
 └── supabase/
     ├── config.toml           local Supabase stack config
     ├── migrations/           schema + api_* functions, applied in order
     │   ├── 0001_init.sql
-    │   └── 0002_client_journey.sql
+    │   ├── 0002_client_journey.sql
+    │   └── 0003_auth_codes.sql
     ├── templates/            auth emails (6-digit signup code, password reset)
     └── seed.sql
 ```
@@ -66,7 +68,32 @@ REACT_APP_API_URL=http://localhost:5000/api
 | `JWT_SECRET`, `JWT_EXPIRES_IN` | Signing key and lifetime for this API's login tokens |
 | `DATABASE_URL` | Supabase Postgres connection string |
 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | Supabase Auth (signup, OTP, login) |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Server only.** Used for file storage and password changes. Never put it in the frontend |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Server only.** Used for account creation, file storage and password changes. Never put it in the frontend |
+| `SMTP_*`, `MAIL_FROM`, `APP_NAME`, `ADMIN_EMAIL` | Outgoing email (see below) |
+
+### Email (nodemailer)
+In Express mode the API sends every email itself over SMTP.
+
+| Email | When |
+|---|---|
+| 6-digit signup code | Register, or resend code. Expires in 10 min, allows 5 attempts, 60 s cooldown and at most 5 per hour |
+| Password-reset link | `/auth/reset-password?token=…` on forgot password. Expires in 60 min and works once |
+| Password changed | After a reset or a change |
+| Booking confirmation | To the client, plus an alert to the advisor |
+| Payment receipt | After a plan purchase |
+| Contact auto-reply | To the sender. A copy goes to `ADMIN_EMAIL` if it is set |
+
+- Codes and tokens are stored only as hashes, in `public.auth_codes` (migration `0003`).
+- **If `SMTP_HOST` is empty, emails are printed in the server console** instead, which is handy for local testing.
+- For Gmail, turn on 2-Step Verification, create an App Password, and set:
+  ```
+  SMTP_HOST=smtp.gmail.com
+  SMTP_PORT=465
+  SMTP_SECURE=true
+  SMTP_USER=you@gmail.com
+  SMTP_PASS=<app password>
+  MAIL_FROM="AunAdvisory <you@gmail.com>"
+  ```
 
 ### Endpoints (all under `/api`)
 Every response is `{ success, data }` (lists add `meta`) or `{ success:false, message }`. Protected endpoints need `Authorization: Bearer <token>`.
