@@ -6,8 +6,10 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import {  NavLink, useNavigate } from "react-router-dom";
+import { useSettings } from "../../context/SettingsContext";
 
 function Footer() {
+  const { platformName } = useSettings();
   const cols = [
   {
     title: "Platform",
@@ -30,7 +32,7 @@ function Footer() {
     ],
   },
   {
-    title: "Legal",
+    title: "Policies",
     links: [
       { label: "Terms of Service", path: "/terms" },
       { label: "Privacy Policy", path: "/privacy" },
@@ -81,13 +83,13 @@ function Footer() {
         <div className="container">
           <div className="row">
             <div className="col-lg-4 col-md-6 col-sm-12 mb-4">
-              <h5 className="sub-title">AunAdvisory</h5>
+              <h5 className="sub-title">{platformName}</h5>
               <div className="footer-text">
                 <p>
-                  Aunai Legal Solutions and Services employs a smart AI-legal
-                  approach with the option to escalate to legal professionals.
-                  We help global entrepreneurs and businesses expand into the
-                  Gulf with efficient, compliant market entry.
+                  {platformName} provides business, market-entry and
+                  regulatory-navigation advisory for global entrepreneurs and
+                  businesses expanding into the Gulf. We are not a law firm —
+                  legal work is handled by independent licensed counsel.
                 </p>
               </div>
             </div>
@@ -115,7 +117,7 @@ function Footer() {
           <div className="row footer-bottom align-items-center">
             <div className="col-lg-7">
               <p className="mb-0">
-                © {new Date().getFullYear()} AunAdvisory. All rights reserved.
+                © {new Date().getFullYear()} {platformName}. All rights reserved.
               </p>
             </div>
 

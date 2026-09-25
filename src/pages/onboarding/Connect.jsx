@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useSettings } from '../../context/SettingsContext';
 import { FaFileAlt, FaUpload, FaUserTie, FaCalendarCheck, FaRocket } from 'react-icons/fa';
 
 const NEXT_STEPS = [
@@ -11,6 +12,7 @@ const NEXT_STEPS = [
 ];
 
 export default function Connect() {
+  const { platformName } = useSettings();
   const { user }   = useAuth();
   const navigate   = useNavigate();
   const dashPath   = user?.role === 'advisor' ? '/advisor/dashboard' : '/user/dashboard';
@@ -20,7 +22,7 @@ export default function Connect() {
       <div className="container-fluid px-0">
         <nav className="onboarding-nav navbar px-5">
         <h4 className="anu-logo-title mb-0">
-          AunAdvisory
+          {platformName}
         </h4>
       </nav>
       </div>

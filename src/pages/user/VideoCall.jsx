@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { userAPI } from '../../services/api';
 import { showToast } from '../../components/common/index';
+import { useSettings } from '../../context/SettingsContext';
 
 const ControlBtn = ({ icon, onClick, danger, active, title }) => (
   <button
@@ -24,6 +25,7 @@ const ControlBtn = ({ icon, onClick, danger, active, title }) => (
 );
 
 export default function VideoCall() {
+  const { platformName } = useSettings();
   const location     = useLocation();
   const navigate     = useNavigate();
   const { id }       = useParams();
@@ -188,7 +190,7 @@ export default function VideoCall() {
       {/* Top Bar */}
       <div style={{ height: 52, background: '#111', borderBottom: '1px solid #2F343A', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontFamily: 'sans-serif', fontSize: 14, fontWeight: 700, color: 'white' }}><FaBuilding style={{ marginRight: 6, verticalAlign: '-2px' }} />AunAdvisory</div>
+          <div style={{ fontFamily: 'sans-serif', fontSize: 14, fontWeight: 700, color: 'white' }}><FaBuilding style={{ marginRight: 6, verticalAlign: '-2px' }} />{platformName}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {jitsiReady
               ? <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', background: 'rgba(22,163,74,0.2)', color: '#16A34A', borderRadius: 4 }}><GoDotFill style={{ verticalAlign: '-2px' }} /> Live Session</span>

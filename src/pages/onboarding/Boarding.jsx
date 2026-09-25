@@ -2,6 +2,7 @@ import { FaRocket } from 'react-icons/fa';
 import { useState } from 'react';
 import { Navigate, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useSettings } from '../../context/SettingsContext';
 import { FiZap, FiLock, FiGlobe, FiClipboard } from "react-icons/fi";
 import {
     FiHome,
@@ -38,6 +39,7 @@ const Dots = ({ total, active }) => (
 
 
 export default function Boarding() {
+  const { platformName } = useSettings();
     // const nav = useNavigate();
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -65,7 +67,7 @@ export default function Boarding() {
         { icon: <FiFileText />, label: 'Get a License', desc: 'Business licensing & trade permits' },
         { icon: <FiCreditCard />, label: 'Visa & Residency', desc: 'Work permits & residency applications' },
         { icon: <FiDollarSign />, label: 'Tax Advisory', desc: 'VAT, corporate tax & compliance' },
-        { icon: <FiClipboard />, label: 'Contract Review', desc: 'Legal document drafting & review' },
+        { icon: <FiClipboard />, label: 'Contract Review', desc: 'Commercial terms review — drafting by licensed counsel' },
         { icon: <FiCheckCircle />, label: 'Compliance', desc: 'Regulatory & corporate governance' },
         { icon: <FiAward />, label: 'Trademark / IP', desc: 'Brand protection & IP rights' },
         { icon: <FiUsers />, label: 'M&A Advisory', desc: 'Mergers, acquisitions & due diligence' },
@@ -86,7 +88,7 @@ export default function Boarding() {
                     <div className='col-lg-12 px-0'>
                         <div className='onboarding-header'>
                             <div className='onboarding-logo-box'>
-                                <NavLink to="/"> <span className='fz-28 fw-700 text-white'>AunAdvisory</span> </NavLink>
+                                <NavLink to="/"> <span className='fz-28 fw-700 text-white'>{platformName}</span> </NavLink>
                             </div>
                             <div className='onboarding-skip-box'>
                                 <button onClick={skip} className='skip-btn' onClick={() => navigate('/user/dashboard')}>

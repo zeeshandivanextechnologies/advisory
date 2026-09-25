@@ -14,7 +14,7 @@ export default function AdminDashboard() {
   const [data, setData]   = useState(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod]   = useState('30d'); // FIX: working filter state
-  const { currency }      = useSettings();
+  const { currency, platformName } = useSettings();
 
   const load = useCallback(() => {
     setLoading(true);
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
         <div className="page-header mb-3">
           <div>
             <h4 style={{ fontSize: 24, color: '#000000', fontFamily: 'var(--font-h)', fontWeight: 600, letterSpacing: '0.02em', marginBottom : 0 }}>Platform Overview</h4> 
-            <p style={{ fontSize: 14, color: '#4A4949',  fontWeight: 400, letterSpacing: '0.02em', marginBottom : 0 }}>Complete administrative overview — AunAdvisory</p>
+            <p style={{ fontSize: 14, color: '#4A4949',  fontWeight: 400, letterSpacing: '0.02em', marginBottom : 0 }}>Complete administrative overview — {platformName}</p>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems : "center"}}>
             {/* FIX: Working date filter with onChange */}

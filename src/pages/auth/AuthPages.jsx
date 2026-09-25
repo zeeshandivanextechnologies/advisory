@@ -59,7 +59,7 @@ export function Register() {
               <select className="auth-select-dark" value={form.role} onChange={e => set('role', e.target.value)} required>
                 <option value="" disabled>Select your role</option>
                 <option value="user">Business Owner / Entrepreneur</option>
-                <option value="advisor">Legal Professional / Advisor</option>
+                <option value="advisor">Business Advisor</option>
               </select>
             </div>
             <div className="auth-form-group">

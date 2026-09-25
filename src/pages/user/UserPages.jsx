@@ -139,7 +139,7 @@ export function ConnectAdvisor() {
         <div className="page-header">
           <div>
             <h1 className="page-title">Find Your Advisor</h1>
-            <p className="page-subtitle">Connect with verified GCC legal & business advisors</p>
+            <p className="page-subtitle">Connect with verified GCC business & regulatory advisors</p>
           </div>
         </div>
 

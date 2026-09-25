@@ -119,7 +119,7 @@ function Navbar() {
     <header className={`tp-header-section ${isSticky ? "tp-header-sticky" : ""}`}>
       {/* Prominent Legal Disclaimer */}
       <div style={{ background: '#111', color: '#fff', textAlign: 'center', padding: '8px 15px', fontSize: '12px', fontWeight: '500', letterSpacing: '0.04em' }}>
-        <span style={{ color: 'var(--secondary-col)', fontWeight: '700' }}>Disclaimer:</span> Integra is not a law firm. We provide business advisory services.
+        <span style={{ color: 'var(--secondary-col)', fontWeight: '700' }}>Disclaimer:</span> {platformName} is not a law firm. We provide business advisory services.
       </div>
       <nav ref={headerRef} className="navbar navbar-expand-lg navbar-light-box">
         <div className="container">
@@ -411,7 +411,7 @@ function Services() {
     {
       icon: <FaCheckCircle />,
       title: 'Regulatory Review',
-      desc: 'In-depth analysis of legal and compliance requirements specific to your sector.'
+      desc: 'In-depth analysis of the regulatory and compliance requirements specific to your sector.'
     },
     {
       icon: <FaPassport />,
@@ -421,7 +421,7 @@ function Services() {
     {
       icon: <FaFileContract />,
       title: 'Advisory Retainer',
-      desc: 'Ongoing strategic and legal advisory for sustained compliance and growth.'
+      desc: 'Ongoing strategic and regulatory advisory for sustained compliance and growth.'
     }
   ];
 
@@ -570,7 +570,7 @@ function Pricing() {
   }) : [
     { tier: 'Executive Discovery', price: 'Custom', period: '', desc: 'Initial consultation and feasibility check.', features: ['45-min Discovery Call', 'High-level feasibility check', 'Needs Assessment'], unavail: ['Detailed Blueprint', 'Execution / Filing'], cta: 'Book Discovery', featured: false },
     { tier: 'Market Entry Blueprint', price: 'Custom', period: '', desc: 'Strategic roadmap for GCC expansion.', features: ['Market Analysis', 'Jurisdiction Selection', 'Step-by-step Roadmap', 'Cost Estimation'], unavail: ['Company Registration', 'Visa Processing'], cta: 'Get Blueprint', featured: true },
-    { tier: 'Regulatory Review', price: 'Custom', period: '', desc: 'Compliance and legal gap analysis.', features: ['Sector Compliance Check', 'Legal Gap Analysis', 'Risk Mitigation Report'], unavail: ['Ongoing Retainer', 'Representation'], cta: 'Request Review', featured: false },
+    { tier: 'Regulatory Review', price: 'Custom', period: '', desc: 'Compliance and regulatory gap analysis.', features: ['Sector Compliance Check', 'Regulatory Gap Analysis', 'Risk Mitigation Report'], unavail: ['Ongoing Retainer', 'Representation'], cta: 'Request Review', featured: false },
     { tier: 'Incorporation Pathway', price: 'Custom', period: '', desc: 'End-to-end business setup.', features: ['Trade License Setup', 'PRO Services', 'Bank Account Intro', 'Visa Assistance'], unavail: ['Post-setup Retainer'], cta: 'Start Incorporation', featured: false },
     { tier: 'Advisory Retainer', price: 'Custom', period: '/month', desc: 'Ongoing support for your business.', features: ['Dedicated Advisor', 'Monthly Strategy Calls', 'Ongoing Compliance', 'Priority Support'], unavail: [], cta: 'Join Retainer', featured: true },
   ];
@@ -802,8 +802,9 @@ function WorkFlow() {
 
 /* ── Testimonials ──────────────────────────────────────────── */
 function Testimonials() {
+  const { platformName } = useSettings();
   const testimonials = [
-    { name: 'Omar Al-Khalid', role: 'CEO, TechVentures Qatar', rating: '★★★★★', text: 'AunAdvisory helped us set up our QFC entity in record time. The advisors were professional, responsive, and truly understood our needs.' },
+    { name: 'Omar Al-Khalid', role: 'CEO, TechVentures Qatar', rating: '★★★★★', text: `${platformName} helped us set up our QFC entity in record time. The advisors were professional, responsive, and truly understood our needs.` },
     { name: 'Sarah Al-Nouri', role: 'Founder, NovaBrands UAE', rating: '★★★★★', text: 'From trademark filing to employment visas, the platform handles everything. It has become an essential tool for our business operations.' },
     { name: 'James Hartley', role: 'CFO, FintechCore DIFC', rating: '★★★★★', text: 'The tax advisory team saved us significant costs through proper structuring. The whole experience was seamless and highly professional.' },
   ];
@@ -898,14 +899,15 @@ function Testimonials() {
 /* ── Faq  ──────────────────────────────────────────── */
 
 function Faq() {
+  const { platformName } = useSettings();
   const [openFaq, setOpenFaq] = useState(0);
 
   const faqs = [
     {
       id: 1,
-      question: "How does Aun Advisory help my business?",
+      question: `How does ${platformName} help my business?`,
       answer:
-        "We provide expert legal and compliance guidance tailored to your business needs.",
+        "We provide business, market-entry and regulatory guidance tailored to your needs. We are not a law firm; when a matter needs a lawyer, we introduce you to licensed counsel.",
     },
     {
       id: 2,
@@ -1074,10 +1076,11 @@ function CTABand() {
 
 /* ── Footer ────────────────────────────────────────────────── */
 function Footer() {
+  const { platformName } = useSettings();
   const cols = [
     { title: 'Platform', links: ['Dashboard', 'How It Works', 'Pricing', 'Advisors', 'Case Tracking'] },
     { title: 'Services', links: ['Company Formation', 'Business Licensing', 'Visa & Residency', 'Tax Advisory', 'Contract Review'] },
-    { title: 'Legal', links: ['Terms of Service', 'Privacy Policy', 'Disclaimer', 'Cookie Policy', 'Contact Us'] },
+    { title: 'Policies', links: ['Terms of Service', 'Privacy Policy', 'Disclaimer', 'Cookie Policy', 'Contact Us'] },
   ];
 
 
@@ -1141,13 +1144,13 @@ function Footer() {
       <div className="container">
         <div className="row mb-5">
           <div className="col-lg-4 col-md-6 col-sm-12 mb-4">
-            <h5 className="sub-title">AunAdvisory</h5>
+            <h5 className="sub-title">{platformName}</h5>
             <div className="footer-text">
               <p>
-                Aunai Legal Solutions and Services employs a smart AI-legal approach
-                with the option to escalate to legal professionals. We help global
-                entrepreneurs and businesses expand into the Gulf with efficient,
-                compliant market entry.
+                {platformName} provides business, market-entry and regulatory-navigation
+                advisory for global entrepreneurs and businesses expanding into the Gulf.
+                We are not a law firm — legal work is handled by independent licensed
+                counsel.
               </p>
             </div>
 
@@ -1181,7 +1184,7 @@ function Footer() {
         <div className="row footer-bottom align-items-center">
           <div className="col-lg-7">
             <p className="mb-0">
-              © {new Date().getFullYear()} AunAdvisory. All rights reserved.
+              © {new Date().getFullYear()} {platformName}. All rights reserved.
             </p>
           </div>
 

@@ -85,7 +85,7 @@ export default function Register() {
               >
                 <option value="" disabled>Choose your role</option>
                 <option value="user">Business Owner / Entrepreneur</option>
-                <option value="advisor">Legal Professional / Advisor</option>
+                <option value="advisor">Business Advisor</option>
               </select>
             </div>
 
@@ -210,7 +210,7 @@ export default function Register() {
                                 >
                                   <option value="" disabled>Choose your role</option>
                                   <option value="user">Business Owner / Entrepreneur</option>
-                                  <option value="advisor">Legal Professional / Advisor</option>
+                                  <option value="advisor">Business Advisor</option>
                                 </select>
                               </div>
                             </div>

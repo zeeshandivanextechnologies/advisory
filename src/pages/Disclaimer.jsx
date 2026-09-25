@@ -1,7 +1,9 @@
 import { FiAlertTriangle } from 'react-icons/fi';
+import { useSettings } from '../context/SettingsContext';
 // export { Disclaimer as default } from './PublicPages';
 
 function Disclaimer() {
+  const { platformName } = useSettings();
   return (
     <>
     <section className="legal-section">
@@ -35,20 +37,34 @@ function Disclaimer() {
           <div className="legal-warning-box">
             <span className="warning-icon"><FiAlertTriangle /></span>
             <p>
-              <strong>Important:</strong> AunAdvisory is an information and
-              connection platform. Content on this platform does not constitute
-              legal advice and should not be relied upon as such.
+              <strong>Important:</strong> {platformName} is not a law firm. We
+              provide business, market-entry and regulatory-navigation advisory.
+              Nothing on this platform is legal advice and it should not be
+              relied upon as such.
             </p>
           </div>
 
           {/* Sections */}
 
           <div className="legal-update-content">
+            <h2>Not a Law Firm</h2>
+            <p>
+              {platformName} is a business advisory firm, not a law firm. We do
+              not provide legal advice, legal opinions, legal drafting or
+              representation before courts or authorities, and no
+              lawyer–client relationship is created by using the Platform.
+              Where a matter needs a lawyer, we introduce you — only with your
+              consent — to independent, licensed counsel in the relevant
+              jurisdiction, who is responsible for that legal work.
+            </p>
+          </div>
+
+          <div className="legal-update-content">
             <h2>No Legal Advice</h2>
             <p>
-              AunAdvisory is a technology platform that connects users with
-              independent advisors. The information, guidance, and content
-              available on the Platform — whether from AunAdvisory or its
+              {platformName} provides business advisory services and connects
+              users with independent advisors. The information, guidance, and content
+              available on the Platform — whether from {platformName} or its
               advisors — is for general informational purposes only and does not
               constitute legal, financial, tax, or regulatory advice.
             </p>
@@ -61,14 +77,14 @@ function Disclaimer() {
               professional in your specific jurisdiction before making any
               legal, financial, or business decisions. The advisors listed on
               the Platform are independent professionals; their views are their
-              own and do not represent the views of AunAdvisory.
+              own and do not represent the views of {platformName}.
             </p>
           </div>
 
           <div className="legal-update-content">
             <h2>No Guarantee of Outcomes</h2>
             <p>
-              AunAdvisory makes no representations or warranties about the
+              {platformName} makes no representations or warranties about the
               accuracy, completeness, or suitability of information provided on
               the Platform. Business registration, licensing, and regulatory
               outcomes depend on many factors outside our control.
@@ -88,7 +104,7 @@ function Disclaimer() {
           <div className="legal-update-content">
             <h2>Limitation of Liability</h2>
             <p>
-              To the fullest extent permitted by law, AunAdvisory expressly
+              To the fullest extent permitted by law, {platformName} expressly
               disclaims all liability for any loss or damage — whether direct,
               indirect, incidental, or consequential — arising from your
               reliance on content or advice available through the Platform.

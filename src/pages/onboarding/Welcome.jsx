@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useSettings } from '../../context/SettingsContext';
 import { FiZap, FiLock, FiGlobe, FiClipboard } from 'react-icons/fi';
 import { FaArrowRight } from 'react-icons/fa';
 
@@ -12,6 +13,7 @@ const FEATURES = [
 ];
 
 export default function Welcome() {
+  const { platformName } = useSettings();
   const { user } = useAuth();
   const navigate  = useNavigate();
 
@@ -20,7 +22,7 @@ export default function Welcome() {
       <div className="container-fluid px-0">
         <nav className="onboarding-nav navbar px-5">
         <h4 className="anu-logo-title mb-0">
-          AunAdvisory
+          {platformName}
         </h4> 
         <button className="fw-600 fz-16 text-black" onClick={() => navigate('/user/dashboard')}>
           Skip <FaArrowRight />

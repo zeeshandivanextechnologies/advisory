@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { intakeAPI } from '../../services/api';
+import { useSettings } from '../../context/SettingsContext';
 import { FaBuilding, FaFileAlt, FaPassport, FaMoneyBillWave, FaCheckCircle, FaTrademark, FaBalanceScale, FaHandshake, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 const NEEDS = [
@@ -8,13 +9,14 @@ const NEEDS = [
   { icon: <FaFileAlt />,     label: 'Get a License',     desc: 'Business licensing & trade permits' },
   { icon: <FaPassport />,    label: 'Visa & Residency',  desc: 'Work permits & residency applications' },
   { icon: <FaMoneyBillWave />, label: 'Tax Advisory',    desc: 'VAT, corporate tax & compliance' },
-  { icon: <FaCheckCircle />, label: 'Contract Review',   desc: 'Legal document drafting & review' },
+  { icon: <FaCheckCircle />, label: 'Contract Review',   desc: 'Commercial terms review — drafting by licensed counsel' },
   { icon: <FaBalanceScale />, label: 'Compliance',       desc: 'Regulatory & corporate governance' },
   { icon: <FaTrademark />,   label: 'Trademark / IP',    desc: 'Brand protection & IP rights' },
   { icon: <FaHandshake />,   label: 'M&A Advisory',      desc: 'Mergers, acquisitions & due diligence' },
 ];
 
 export default function Needs() {
+  const { platformName } = useSettings();
   const navigate         = useNavigate();
   const [selected, setSelected] = useState([]);
 
@@ -28,7 +30,7 @@ export default function Needs() {
      <div className="container-fluid px-0">
        <nav className="onboarding-nav navbar px-5">
         <h4 className='anu-logo-title mb-0'>
-          AunAdvisory
+          {platformName}
         </h4>
         <button className="fw-600 fz-16 text-black" onClick={() => navigate('/onboarding/connect')}>
           Skip <FaArrowRight />

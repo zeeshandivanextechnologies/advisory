@@ -106,7 +106,7 @@ export default function AdminSettings() {
         <div className="page-header mb-2">
           <div>
             <h4 style={{ fontSize: 24, color: '#000000', fontFamily: 'var(--font-h)', fontWeight: 600, letterSpacing: '0.02em', marginBottom : 0 }} >Platform Settings</h4>
-            <p style={{ fontSize: 14, color: '#4A4949', fontFamily: 'var(--font-h)', fontWeight: 400,  marginBottom : 0 }} >Manage global configuration for AunAdvisory</p>
+            <p style={{ fontSize: 14, color: '#4A4949', fontFamily: 'var(--font-h)', fontWeight: 400,  marginBottom : 0 }} >Manage global platform configuration</p>
           </div>
           {activeTab !== 'plans' && (
             <button className="thm-btn" onClick={save} disabled={saving}>

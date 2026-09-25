@@ -125,7 +125,7 @@ export default function Login() {
                 <div className="login-header-content">
                   <div className="lg_sub_content mb-5">
                     <h3>Welcome Back</h3>
-                    <p>Sign in to access your legal dashboard</p>
+                    <p>Sign in to access your advisory dashboard</p>
                   </div>
 
                   <div className="row">

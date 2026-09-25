@@ -101,6 +101,10 @@ function Header() {
          </nav> */}
  
       <header className={`tp-header-section ${isSticky ? "tp-header-sticky" : ""}`}>
+        {/* Disclaimer: business advisory, not a law firm */}
+        <div style={{ background: '#111', color: '#fff', textAlign: 'center', padding: '8px 15px', fontSize: '12px', fontWeight: '500', letterSpacing: '0.04em' }}>
+          <span style={{ color: 'var(--secondary-col)', fontWeight: '700' }}>Disclaimer:</span> {platformName} is not a law firm. We provide business advisory services.
+        </div>
         <nav ref={headerRef} className="navbar navbar-expand-lg navbar-light-box">
           <div className="container">
             <NavLink className="navbar-brand anu-logo-title me-0" to="/">

@@ -4,6 +4,7 @@ import React from 'react'
 import { useSettings } from '../context/SettingsContext';
 
 function Terms() {
+  const { platformName } = useSettings();
   return (
     <>
     <section className="legal-section">
@@ -39,7 +40,7 @@ function Terms() {
               <div className="legal-update-content">
                 <h2>1. Acceptance of Terms</h2>
                 <p>
-                  By accessing or using AunAdvisory ("the Platform"), you agree
+                  By accessing or using {platformName} ("the Platform"), you agree
                   to be bound by these Terms of Service and all applicable laws
                   and regulations. If you do not agree with any part of these
                   terms, you may not access the Platform.
@@ -49,12 +50,14 @@ function Terms() {
               <div className="legal-update-content">
                 <h2>2. Description of Services</h2>
                 <p>
-                  AunAdvisory provides a digital platform connecting clients
-                  with verified legal and business advisors specializing in GCC
+                  {platformName} provides business, market-entry and
+                  regulatory-navigation advisory, and connects clients with
+                  verified business and regulatory advisors specializing in GCC
                   jurisdictions. Services include company formation advisory,
                   licensing guidance, visa assistance, tax consultation, and
-                  contract review. The Platform facilitates connections between
-                  parties but does not itself provide legal advice.
+                  commercial contract review. {platformName} is not a law firm
+                  and does not provide legal advice; legal work is referred, with
+                  your consent, to independent licensed counsel.
                 </p>
               </div>
 
@@ -78,9 +81,9 @@ function Terms() {
                 <h2>4. Advisor Relationship</h2>
                 <p>
                   Advisors on the Platform are independent professionals.
-                  AunAdvisory does not employ advisors and is not responsible
+                  {platformName} does not employ advisors and is not responsible
                   for the quality, accuracy, or legality of advice provided.
-                  Clients engage advisors directly and AunAdvisory acts solely
+                  Clients engage advisors directly and {platformName} acts solely
                   as an intermediary platform.
                 </p>
               </div>
@@ -110,7 +113,7 @@ function Terms() {
                 <h2>7. Intellectual Property</h2>
                 <p>
                   All content, trademarks, logos, and platform technology are
-                  the exclusive property of AunAdvisory. Users may not
+                  the exclusive property of {platformName}. Users may not
                   reproduce, distribute, or create derivative works without
                   explicit written permission.
                 </p>
@@ -119,7 +122,7 @@ function Terms() {
               <div className="legal-update-content">
                 <h2>8. Limitation of Liability</h2>
                 <p>
-                  AunAdvisory shall not be liable for any indirect, incidental,
+                  {platformName} shall not be liable for any indirect, incidental,
                   special, or consequential damages arising from use of the
                   Platform. Our total liability shall not exceed the fees paid
                   by you in the three months preceding the claim.

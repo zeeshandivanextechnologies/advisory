@@ -31,8 +31,8 @@ const CATEGORIES = [
   { value: 'contract_review',   icon: <FaFileAlt />,         label: 'Contract Review',        desc: 'Upload and analyse any commercial agreement.' },
   { value: 'compliance',        icon: <FaCheckCircle />,     label: 'Compliance Check',       desc: 'Full regulatory audit — GTA tax, MADLSA, QFC/MOCI filings.' },
   { value: 'licensing',         icon: <FaStore />,           label: 'Trade Licence Renewal',  desc: 'Renew Qatar trade, commercial, or professional licence.' },
-  { value: 'trademark',         icon: <FaTrademark />,       label: 'IP & Trademark',         desc: 'Register, protect, or enforce intellectual property rights.' },
-  { value: 'other',             icon: <FaBalanceScale />,    label: 'Civil / Legal Cases',    desc: 'Legal conflicts, disputes, property, labour issues.' },
+  { value: 'trademark',         icon: <FaTrademark />,       label: 'IP & Trademark',         desc: 'Register and protect IP; enforcement via licensed counsel.' },
+  { value: 'other',             icon: <FaBalanceScale />,    label: 'Other Matters',          desc: 'Disputes, property or labour issues — we coordinate licensed counsel.' },
   { value: 'visa',              icon: <FaPassport />,        label: 'Visa & Residency',       desc: 'Residence permits, work visas, and immigration.' },
   { value: 'tax',               icon: <FaMoneyBillWave />,   label: 'Tax Advisory',           desc: 'Corporate tax planning and compliance.' },
 ];
@@ -210,7 +210,7 @@ export default function StartBusiness() {
         {step === 1 && (
            <div className='case-step-box'>
               <h2 style={{ fontSize: 18, fontWeight: 500, fontFamily: 'var(--font-h)', marginBottom: 0, color : "#000000" }}>What do you need help with?</h2>
-              <p style={{ fontSize: 14, color: '#4A4949', marginBottom: 10 }}>What type of legal matter is this?</p>
+              <p style={{ fontSize: 14, color: '#4A4949', marginBottom: 10 }}>What type of matter is this?</p>
               {/* <div className='row'>
                {CATEGORIES.map(c => (
                   <div key={c.value} onClick={() => set('category', c.value)} style={{
@@ -430,7 +430,7 @@ export default function StartBusiness() {
              <div className='case-step-box'>
               <h4 style={{ fontSize: 18, fontWeight : 400, color : "#000", fontFamily: 'var(--font-h)', marginBottom: 10 }}>Why these categories?</h4>
               <p style={{ fontSize: 14, fontWeight : 400, color: '#4A4949', lineHeight: 1.7 }}>
-                Each category loads a tailored workflow — the right documents, checklist, legal citations, and professional escalation path for Qatar jurisdiction.
+                Each category loads a tailored workflow — the right documents, checklist, regulatory references, and professional escalation path for Qatar jurisdiction.
               </p>
             </div>
 
