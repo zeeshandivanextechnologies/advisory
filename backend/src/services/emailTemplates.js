@@ -147,3 +147,24 @@ exports.caseUpdate = ({ name, title, summary, nextSteps }) => ({
   ].join('')),
   text: `${title}\n\n${summary}${nextSteps ? `\n\nNext steps: ${nextSteps}` : ''}`,
 });
+
+exports.serviceRequestAck = ({ name, offering }) => ({
+  subject: `We received your request — ${offering}`,
+  html: layout('Request received', [
+    p(`Hi ${esc(name)},`),
+    p(`Thank you for your interest in <b>${esc(offering)}</b>. We will reply within 4–6 working hours with next steps.`),
+    button(`${env.frontendUrl}/user/services`, 'View my requests'),
+  ].join('')),
+  text: `We received your request for ${offering} and will reply within 4–6 working hours.`,
+});
+
+exports.serviceRequestAdmin = ({ name, email, offering, message, budget }) => ({
+  subject: `New service request: ${offering} — ${name}`,
+  html: layout('New service request', [
+    p(`<b>${esc(name)}</b> &lt;${esc(email)}&gt; requested <b>${esc(offering)}</b>.`),
+    budget ? p(`<b>Budget:</b> ${esc(budget)}`) : '',
+    message ? p(esc(message).replace(/\n/g, '<br>')) : '',
+    button(`${env.frontendUrl}/admin/services`, 'Open requests'),
+  ].join('')),
+  text: `${name} <${email}> requested ${offering}.${budget ? ` Budget: ${budget}.` : ''}\n\n${message || ''}`,
+});

@@ -60,6 +60,9 @@ export const Badge = ({ status, text, customStyle }) => {
     rejected:    'badge-red',    failed:      'badge-red',    urgent:      'badge-red',
     free:        'badge-gray',   pro:         'badge-blue',   enterprise:  'badge-gray',
     high:        'badge-orange', medium:      'badge-blue',   low:         'badge-gray',
+    new:         'badge-blue',   in_review:   'badge-orange', proposal_sent: 'badge-blue',
+    won:         'badge-green',  declined:    'badge-red',    invited:     'badge-orange',
+    paused:      'badge-orange', ended:       'badge-gray',   expired:     'badge-gray',
   };
   const cls   = map[status] || 'badge-gray';
   const label = text || status?.replace(/_/g, ' ') || '—';

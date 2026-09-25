@@ -11,6 +11,7 @@ const cases = require('../controllers/cases.controller');
 const documents = require('../controllers/documents.controller');
 const admin = require('../controllers/admin.controller');
 const misc = require('../controllers/misc.controller');
+const services = require('../controllers/services.controller');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: env.maxUploadBytes } });
 const router = Router();
@@ -21,6 +22,7 @@ router.get('/settings', h(misc.publicSettings));
 router.post('/contact', h(misc.contact));
 router.post('/payments/stripe/webhook', h(misc.stripeWebhook)); // raw body, see app.js
 router.get('/subscriptions/plans', h(misc.plans));
+router.get('/services/catalog', h(services.catalog));
 
 /* ── Auth ───────────────────────────────────────────────── */
 router.post('/auth/login', h(auth.login));
@@ -91,6 +93,20 @@ router.delete('/subscriptions/admin/plans/:id', h(misc.adminDeletePlan));
 router.get('/payments', h(misc.payments));
 router.get('/payments/stripe/confirm', h(misc.confirmCheckout));
 
+/* ── Services, retainers, community ─────────────────────── */
+router.post('/services/requests', h(services.requestService));
+router.get('/services/requests', h(services.myRequests));
+router.put('/services/requests/:id/cancel', h(services.cancelRequest));
+router.get('/retainers', h(services.retainers));
+router.get('/retainers/:id', h(services.retainerDetail));
+router.post('/retainers/:id/logs', h(services.logHours));
+router.delete('/retainer-logs/:logId', h(services.deleteLog));
+router.get('/community/memberships', h(services.myMemberships));
+router.put('/community/memberships/:id/respond', h(services.respondMembership));
+router.get('/community/events', h(services.events));
+router.put('/community/events/:id/rsvp', h(services.rsvp));
+router.get('/community/briefs', h(services.briefs));
+
 /* ── Admin ──────────────────────────────────────────────── */
 router.get('/admin/dashboard', h(admin.dashboard));
 router.get('/admin/users', h(admin.users));
@@ -102,5 +118,22 @@ router.get('/admin/settings', h(admin.getSettings));
 router.put('/admin/settings', h(admin.updateSettings));
 router.get('/admin/leads', h(admin.leads));
 router.put('/admin/leads/:id', h(admin.updateLead));
+router.get('/admin/services/offerings', h(services.adminOfferings));
+router.post('/admin/services/offerings', h(services.adminCreateOffering));
+router.put('/admin/services/offerings/:id', h(services.adminUpdateOffering));
+router.get('/admin/services/requests', h(services.adminRequests));
+router.put('/admin/services/requests/:id', h(services.adminUpdateRequest));
+router.post('/admin/retainers', h(services.adminCreateRetainer));
+router.put('/admin/retainers/:id', h(services.adminUpdateRetainer));
+router.get('/admin/community/memberships', h(services.adminMemberships));
+router.post('/admin/community/memberships', h(services.adminCreateMembership));
+router.put('/admin/community/memberships/:id', h(services.adminUpdateMembership));
+router.get('/admin/community/events', h(services.adminEvents));
+router.post('/admin/community/events', h(services.adminCreateEvent));
+router.put('/admin/community/events/:id', h(services.adminUpdateEvent));
+router.delete('/admin/community/events/:id', h(services.adminDeleteEvent));
+router.post('/admin/community/briefs', h(services.adminCreateBrief));
+router.put('/admin/community/briefs/:id', h(services.adminUpdateBrief));
+router.delete('/admin/community/briefs/:id', h(services.adminDeleteBrief));
 
 module.exports = router;

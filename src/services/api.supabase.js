@@ -261,6 +261,41 @@ export const paymentAPI = {
   list: () => rpc('api_payments').then(ok),
 };
 
+/* ── Services catalog, requests, retainers ─────────────────── */
+const optId = (id) => (id ? Number(id) : null);
+
+export const serviceAPI = {
+  getCatalog:         ()         => rpc('api_service_catalog').then(ok),
+  requestService:     (data)     => rpc('api_request_service', { p: data }).then(ok),
+  getMyRequests:      ()         => rpc('api_my_service_requests').then(ok),
+  cancelRequest:      (id)       => rpc('api_cancel_service_request', { p_id: Number(id) }).then(ok),
+  getRetainers:       (p = {})   => rpc('api_retainers', { p }).then(ok),
+  getRetainer:        (id)       => rpc('api_retainer_detail', { p_id: Number(id) }).then(ok),
+  logHours:           (id, data) => rpc('api_log_retainer_hours', { p_retainer_id: Number(id), p: data }).then(ok),
+  deleteLog:          (logId)    => rpc('api_delete_retainer_log', { p_id: Number(logId) }).then(ok),
+  adminGetOfferings:  ()         => rpc('api_admin_offerings').then(ok),
+  adminSaveOffering:  (id, data) => rpc('api_admin_save_offering', { p_id: optId(id), p: data }).then(ok),
+  adminGetRequests:   (p = {})   => rpc('api_admin_service_requests', { p }).then(okList),
+  adminUpdateRequest: (id, data) => rpc('api_admin_update_service_request', { p_id: Number(id), p: data }).then(ok),
+  adminSaveRetainer:  (id, data) => rpc('api_admin_save_retainer', { p_id: optId(id), p: data }).then(ok),
+};
+
+/* ── Community: memberships, events, market briefs ─────────── */
+export const communityAPI = {
+  getMemberships:      ()           => rpc('api_my_memberships').then(ok),
+  respondMembership:   (id, accept) => rpc('api_respond_membership', { p_id: Number(id), p_accept: !!accept }).then(ok),
+  getEvents:           ()           => rpc('api_events').then(ok),
+  rsvp:                (id, going)  => rpc('api_rsvp_event', { p_event_id: Number(id), p_going: going !== false }).then(ok),
+  getBriefs:           ()           => rpc('api_market_briefs').then(ok),
+  adminGetMemberships: (p = {})     => rpc('api_admin_memberships', { p }).then(ok),
+  adminSaveMembership: (id, data)   => rpc('api_admin_save_membership', { p_id: optId(id), p: data }).then(ok),
+  adminGetEvents:      ()           => rpc('api_admin_events').then(ok),
+  adminSaveEvent:      (id, data)   => rpc('api_admin_save_event', { p_id: optId(id), p: data }).then(ok),
+  adminDeleteEvent:    (id)         => rpc('api_admin_delete_event', { p_id: Number(id) }).then(ok),
+  adminSaveBrief:      (id, data)   => rpc('api_admin_save_brief', { p_id: optId(id), p: data }).then(ok),
+  adminDeleteBrief:    (id)         => rpc('api_admin_delete_brief', { p_id: Number(id) }).then(ok),
+};
+
 /* ── Public (no login needed) ──────────────────────────────── */
 export const publicAPI = {
   getSettings: ()     => rpc('api_public_settings').then(ok),

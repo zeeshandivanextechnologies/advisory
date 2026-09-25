@@ -293,9 +293,9 @@ export default function Documents() {
               <h3 style={{ fontSize: 15, fontFamily: 'var(--font-h)', fontWeight: 700, color: 'var(--text-dark)' }}>Document</h3>
               <button onClick={() => setViewDoc(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: '#000' }}> <IoClose size={20} /> </button>
             </div>
-            <div style={{ textAlign: 'center', padding: '20px 0 24px' , border : "2px dashed #EDEDED", borderRadius : 6, marginBottom : 10 }}>
+            <div style={{ textAlign: 'center', padding: '20px 10px 24px' , border : "2px dashed #EDEDED", borderRadius : 6, marginBottom : 10 }}>
               <span style={{ fontSize: 40, marginBottom: 0, color : "#CECECE" }}><GoFileDirectoryFill /></span>
-              <h6 style={{ fontSize: 14, fontWeight: 400, color: '#4A4949' }}>{viewDoc.original_name}</h6>
+              <h6 style={{ fontSize: 14, fontWeight: 400, color: '#4A4949', wordBreak : "break-all" }}>{viewDoc.original_name}</h6>
             </div>
 
             <button

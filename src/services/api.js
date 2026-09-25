@@ -23,3 +23,5 @@ export const adminAPI         = impl.adminAPI;
 export const subscriptionAPI  = impl.subscriptionAPI;
 export const paymentAPI       = impl.paymentAPI;
 export const publicAPI        = impl.publicAPI;
+export const serviceAPI       = impl.serviceAPI;
+export const communityAPI     = impl.communityAPI;

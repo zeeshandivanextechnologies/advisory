@@ -33,6 +33,8 @@ import UserSettings      from './pages/user/Settings';
 import SessionNotes      from './pages/user/SessionNotes';
 import VideoCall         from './pages/user/VideoCall';
 import Plans             from './pages/user/Plans';
+import UserServices      from './pages/user/Services';
+import UserCommunity     from './pages/user/Community';
 
 import AdvisorLayout        from './components/layout/AdvisorLayout';
 import AdvisorDashboard     from './pages/advisor/Dashboard';
@@ -41,6 +43,7 @@ import AdvisorClients       from './pages/advisor/Clients';
 import AdvisorSchedule      from './pages/advisor/Schedule';
 import AdvisorNotifications from './pages/advisor/Notifications';
 import AdvisorSettings      from './pages/advisor/Settings';
+import AdvisorRetainers     from './pages/advisor/Retainers';
 
 import AdminLayout    from './components/layout/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
@@ -50,6 +53,8 @@ import AdminCases     from './pages/admin/Cases';
 import AdminDocuments from './pages/admin/Documents';
 import AdminRevenue   from './pages/admin/Revenue';
 import AdminSettings  from './pages/admin/Settings';
+import AdminServices  from './pages/admin/Services';
+import AdminCommunity from './pages/admin/Community';
 import Home from './pages/Landing/Home';
 import LandingLayout from './pages/Landing/LandingLayout';
 import Boarding from './pages/onboarding/Boarding';
@@ -58,7 +63,7 @@ import Boarding from './pages/onboarding/Boarding';
 /* ── Route Guards ────────────────────────────────────────── */
 const ProtectedRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="loading-overlay"><div className="spinner" /></div>;
+  if (loading) return <div className="loading-overlays"><div className="spinner" /></div>;
   if (!user) return <Navigate to="/auth/login" replace />;
   if (roles && !roles.includes(user.role)) {
     const redirects = { admin: '/admin/dashboard', advisor: '/advisor/dashboard', user: '/user/dashboard' };
@@ -126,6 +131,8 @@ function AppRoutes() {
         <Route path="settings"          element={<ErrorBoundary><UserSettings /></ErrorBoundary>} />
         <Route path="session-notes"     element={<ErrorBoundary><SessionNotes /></ErrorBoundary>} />
         <Route path="plans"             element={<ErrorBoundary><Plans /></ErrorBoundary>} />
+        <Route path="services"          element={<ErrorBoundary><UserServices /></ErrorBoundary>} />
+        <Route path="community"         element={<ErrorBoundary><UserCommunity /></ErrorBoundary>} />
       </Route>
 
       <Route path="/user/video-call/:id" element={<ProtectedRoute roles={['user','advisor']}><VideoCall /></ProtectedRoute>} />
@@ -140,6 +147,7 @@ function AppRoutes() {
         <Route path="schedule"      element={<ErrorBoundary><AdvisorSchedule /></ErrorBoundary>} />
         <Route path="notifications" element={<ErrorBoundary><AdvisorNotifications /></ErrorBoundary>} />
         <Route path="settings"      element={<ErrorBoundary><AdvisorSettings /></ErrorBoundary>} />
+        <Route path="retainers"     element={<ErrorBoundary><AdvisorRetainers /></ErrorBoundary>} />
       </Route>
 
       {/* ── Admin ── */}
@@ -152,6 +160,8 @@ function AppRoutes() {
         <Route path="documents"     element={<ErrorBoundary><AdminDocuments /></ErrorBoundary>} />
         <Route path="revenue"       element={<ErrorBoundary><AdminRevenue /></ErrorBoundary>} />
         <Route path="settings"      element={<ErrorBoundary><AdminSettings /></ErrorBoundary>} />
+        <Route path="services"      element={<ErrorBoundary><AdminServices /></ErrorBoundary>} />
+        <Route path="community"     element={<ErrorBoundary><AdminCommunity /></ErrorBoundary>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

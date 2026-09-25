@@ -169,6 +169,39 @@ export const paymentAPI = {
   list: () => api.get('/payments'),
 };
 
+/* ── Services catalog, requests, retainers ─────────────────── */
+export const serviceAPI = {
+  getCatalog:         ()             => api.get('/services/catalog'),
+  requestService:     (data)         => api.post('/services/requests', data),
+  getMyRequests:      ()             => api.get('/services/requests'),
+  cancelRequest:      (id)           => api.put(`/services/requests/${id}/cancel`),
+  getRetainers:       (p)            => api.get('/retainers', { params: p }),
+  getRetainer:        (id)           => api.get(`/retainers/${id}`),
+  logHours:           (id, data)     => api.post(`/retainers/${id}/logs`, data),
+  deleteLog:          (logId)        => api.delete(`/retainer-logs/${logId}`),
+  adminGetOfferings:  ()             => api.get('/admin/services/offerings'),
+  adminSaveOffering:  (id, data)     => id ? api.put(`/admin/services/offerings/${id}`, data) : api.post('/admin/services/offerings', data),
+  adminGetRequests:   (p)            => api.get('/admin/services/requests', { params: p }),
+  adminUpdateRequest: (id, data)     => api.put(`/admin/services/requests/${id}`, data),
+  adminSaveRetainer:  (id, data)     => id ? api.put(`/admin/retainers/${id}`, data) : api.post('/admin/retainers', data),
+};
+
+/* ── Community: memberships, events, market briefs ─────────── */
+export const communityAPI = {
+  getMemberships:      ()           => api.get('/community/memberships'),
+  respondMembership:   (id, accept) => api.put(`/community/memberships/${id}/respond`, { accept }),
+  getEvents:           ()           => api.get('/community/events'),
+  rsvp:                (id, going)  => api.put(`/community/events/${id}/rsvp`, { going }),
+  getBriefs:           ()           => api.get('/community/briefs'),
+  adminGetMemberships: (p)          => api.get('/admin/community/memberships', { params: p }),
+  adminSaveMembership: (id, data)   => id ? api.put(`/admin/community/memberships/${id}`, data) : api.post('/admin/community/memberships', data),
+  adminGetEvents:      ()           => api.get('/admin/community/events'),
+  adminSaveEvent:      (id, data)   => id ? api.put(`/admin/community/events/${id}`, data) : api.post('/admin/community/events', data),
+  adminDeleteEvent:    (id)         => api.delete(`/admin/community/events/${id}`),
+  adminSaveBrief:      (id, data)   => id ? api.put(`/admin/community/briefs/${id}`, data) : api.post('/admin/community/briefs', data),
+  adminDeleteBrief:    (id)         => api.delete(`/admin/community/briefs/${id}`),
+};
+
 /* ── Public (no login needed) ──────────────────────────────── */
 export const publicAPI = {
   getSettings: ()     => api.get('/settings'),

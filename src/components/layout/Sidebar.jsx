@@ -11,6 +11,7 @@ import { FiMessageSquare } from "react-icons/fi";
 import { FiCreditCard } from "react-icons/fi";
 import { FiBell } from "react-icons/fi";
 import { FiSettings } from "react-icons/fi";
+import { FiLayers, FiGlobe, FiClock } from "react-icons/fi";
 
 
 // const Icon = ({ d, extraPath }) => (
@@ -39,7 +40,10 @@ const ICONS = {
   logout:    <FiLogOut />,
   revenue:   <FiBarChart2 />,
   cases:     <FiFolder /> ,
-  schedule:  <FiCalendar />
+  schedule:  <FiCalendar />,
+  services:  <FiLayers />,
+  community: <FiGlobe />,
+  retainers: <FiClock />,
 };
 
 const navItems = {
@@ -47,10 +51,12 @@ const navItems = {
     { label: 'Main', links: [
       { to: '/user/dashboard',        icon: 'dashboard', text: 'Dashboard' },
       { to: '/user/start-business',   icon: 'business',  text: 'Start a Business' },
+      { to: '/user/services',         icon: 'services',  text: 'Services' },
       { to: '/user/documents',        icon: 'docs',      text: 'Upload Documents' },
       { to: '/user/connect-advisor',  icon: 'users',     text: 'Connect Advisor' },
       { to: '/user/consultations',    icon: 'consult',   text: 'Consultations' },
       { to: '/user/plans',            icon: 'plans',     text: 'Subscription Plans' },
+      { to: '/user/community',        icon: 'community', text: 'Community' },
       { to: '/user/notifications',    icon: 'bell',      text: 'Notifications', badge: true },
       { to: '/user/settings',         icon: 'settings',  text: 'Settings' },
     ]},
@@ -62,6 +68,7 @@ const navItems = {
       { to: '/advisor/documents',     icon: 'docs',      text: 'Documents' },
       { to: '/advisor/clients',       icon: 'users',     text: 'Clients' },
       { to: '/advisor/schedule',      icon: 'schedule', text: 'Schedule' },
+      { to: '/advisor/retainers',     icon: 'retainers', text: 'Retainers' },
       { to: '/advisor/notifications', icon: 'bell',      text: 'Notifications', badge: true },
       { to: '/advisor/settings',      icon: 'settings',  text: 'Settings' },
     ]},
@@ -73,6 +80,8 @@ const navItems = {
       { to: '/admin/users',      icon: 'users',     text: 'All Users' },
       { to: '/admin/advisors',   icon: 'consult',   text: 'Advisors' },
       { to: '/admin/cases',      icon: 'cases',     text: 'All Cases' },
+      { to: '/admin/services',   icon: 'services',  text: 'Services' },
+      { to: '/admin/community',  icon: 'community', text: 'Community' },
       { to: '/admin/documents',  icon: 'docs',      text: 'Documents' },
       { to: '/admin/revenue',    icon: 'revenue',   text: 'Revenue' },
       { to: '/admin/settings',   icon: 'settings',  text: 'Settings' },

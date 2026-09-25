@@ -269,7 +269,8 @@ h1,h2,h3,h4,h5,h6 { font-family: var(--font-h); line-height: 1.2; }
 /* ── LOADING ──────────────────────────────────────────────── */
 .spinner { width: 36px; height: 36px; border: 3px solid var(--border-light); border-top-color: var(--lt-black); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-overlay { display: flex; align-items: center; justify-content: center; min-height: 200px; }
+.loading-overlay { display: flex; align-items: center; justify-content: center; min-height: 200px }
+.loading-overlays { display: flex; align-items: center; justify-content: center; min-height: 100vh }
 
 /* ── MODAL ────────────────────────────────────────────────── */
 /* .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 10px; backdrop-filter: blur(4px);  }

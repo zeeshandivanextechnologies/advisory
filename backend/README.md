@@ -38,7 +38,8 @@ backend/
     │   ├── 0001_init.sql
     │   ├── 0002_client_journey.sql
     │   ├── 0003_auth_codes.sql
-    │   └── 0004_pending_features.sql
+    │   ├── 0004_pending_features.sql
+    │   └── 0005_services_catalog.sql
     ├── templates/            auth emails (6-digit signup code, password reset)
     └── seed.sql
 ```
@@ -126,6 +127,17 @@ When Admin → Settings → Maintenance Mode is on:
 - Every non-admin API call returns `503`, including login.
 - Admins and public endpoints (settings, plans, contact) keep working.
 
+### Services, retainers and community (migration `0005`)
+- **Catalog:** 5 categories (Decision, Preparation, Execution, Relationships, Retention). Each offering has a summary, pricing (fixed, starting at, range, monthly, membership or on request), what is in scope, deliverables, what is out of scope, best fit and timeline. Admins edit or hide offerings under Admin → Services. Offerings are never deleted.
+- **Requests:** a client requests an offering, gets an in-app notification and an email, and the admin moves it through new → in review → proposal sent → won or declined. Only one open request per offering is allowed.
+- **Executive Advisory Retainer:**
+  - Hours per month (default 4) and a minimum term (default 3 months). The end date cannot be earlier than the minimum term allows.
+  - The admin or the assigned advisor logs time. Each calendar month is capped at its allotment, and unused hours never roll over.
+- **Community:**
+  - Integra Innovators and Gold memberships are invite-only; the member accepts the invitation.
+  - Events can be for everyone, members only or Gold members only, with RSVP and an optional capacity.
+  - Monthly Market Briefs can go to everyone, retainer clients or members. Publishing one notifies that audience.
+
 ### Endpoints (all under `/api`)
 Every response is `{ success, data }` (lists add `meta`) or `{ success:false, message }`. Protected endpoints need `Authorization: Bearer <token>`.
 
@@ -172,6 +184,14 @@ Every response is `{ success, data }` (lists add `meta`) or `{ success:false, me
   - `GET|POST /subscriptions/admin/plans`
   - `PUT|DELETE /subscriptions/admin/plans/:id`
   - `GET /payments`
+- **Services & retainers:**
+  - `GET /services/catalog` (public)
+  - `GET|POST /services/requests`, `PUT /services/requests/:id/cancel`
+  - `GET /retainers`, `GET /retainers/:id`, `POST /retainers/:id/logs`, `DELETE /retainer-logs/:logId`
+- **Community:**
+  - `GET /community/memberships`, `PUT /community/memberships/:id/respond`
+  - `GET /community/events`, `PUT /community/events/:id/rsvp`
+  - `GET /community/briefs`
 - **Admin:**
   - `GET /admin/dashboard`
   - `GET /admin/users`, `PUT /admin/users/:id/toggle`
@@ -179,6 +199,12 @@ Every response is `{ success, data }` (lists add `meta`) or `{ success:false, me
   - `GET /admin/revenue`
   - `GET|PUT /admin/settings`
   - `GET /admin/leads`, `PUT /admin/leads/:id`
+  - `GET|POST /admin/services/offerings`, `PUT /admin/services/offerings/:id`
+  - `GET /admin/services/requests`, `PUT /admin/services/requests/:id`
+  - `POST /admin/retainers`, `PUT /admin/retainers/:id`
+  - `GET|POST /admin/community/memberships`, `PUT /admin/community/memberships/:id`
+  - `GET|POST /admin/community/events`, `PUT|DELETE /admin/community/events/:id`
+  - `POST /admin/community/briefs`, `PUT|DELETE /admin/community/briefs/:id`
 
 ### How a request flows
 `route → controller → rpc('api_xxx', args, userId)`. The `rpc()` helper in `config/db.js` runs the SQL function inside a transaction as role `authenticated` with the user's id. This is exactly how Supabase runs it, so the SQL function does the role, ownership and validation checks. Its error messages become the HTTP error response.
