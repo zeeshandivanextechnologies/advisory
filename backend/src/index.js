@@ -3,6 +3,7 @@ const app = require('./app');
 const { pool } = require('./config/db');
 const mailer = require('./services/mailer');
 const reminders = require('./services/reminders');
+const journeyJobs = require('./services/journeyJobs');
 
 const server = app.listen(env.port, async () => {
   console.log(`AunAdvisory API listening on http://localhost:${env.port}/api`);
@@ -22,6 +23,10 @@ const server = app.listen(env.port, async () => {
   if (env.remindersEnabled) {
     reminders.start();
     console.log('Session reminders: on (checked every minute)');
+  }
+  if (env.journeyJobsEnabled) {
+    journeyJobs.start();
+    console.log('Client-journey jobs: on (invoice reminders, follow-ups, Friday nudges — hourly)');
   }
   if (!env.supabaseServiceRoleKey) {
     console.warn('SUPABASE_SERVICE_ROLE_KEY not set: document upload/download and password changes will fail');

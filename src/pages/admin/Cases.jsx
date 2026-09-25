@@ -34,6 +34,8 @@ export default function AdminCases() {
     setStatusUpdate(c.status);
   };
 
+  const openWorkspace = () => { const id = detailModal.id; setDetailModal(null); navigate(`/admin/cases/${id}`); };
+
   const handleStatusUpdate = async () => {
     try {
       await caseAPI.update(detailModal.id, { status: statusUpdate });
@@ -149,6 +151,7 @@ export default function AdminCases() {
         footer={
           <>
             <button className="ai-thm-btn outline" onClick={() => setDetailModal(null)}>Cancel</button>
+            <button className="ai-thm-btn outline" onClick={openWorkspace}>Open Workspace</button>
             <button className="ai-thm-btn" onClick={handleStatusUpdate}>Update Status</button>
           </>
         }

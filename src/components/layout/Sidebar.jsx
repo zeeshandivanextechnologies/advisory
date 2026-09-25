@@ -12,6 +12,7 @@ import { FiCreditCard } from "react-icons/fi";
 import { FiBell } from "react-icons/fi";
 import { FiSettings } from "react-icons/fi";
 import { FiLayers, FiGlobe, FiClock } from "react-icons/fi";
+import { FiClipboard, FiInbox } from "react-icons/fi";
 
 
 // const Icon = ({ d, extraPath }) => (
@@ -44,6 +45,8 @@ const ICONS = {
   services:  <FiLayers />,
   community: <FiGlobe />,
   retainers: <FiClock />,
+  engagements: <FiClipboard />,
+  leads:     <FiInbox />,
 };
 
 const navItems = {
@@ -52,6 +55,7 @@ const navItems = {
       { to: '/user/dashboard',        icon: 'dashboard', text: 'Dashboard' },
       { to: '/user/start-business',   icon: 'business',  text: 'Start a Business' },
       { to: '/user/services',         icon: 'services',  text: 'Services' },
+      { to: '/user/engagements',      icon: 'engagements', text: 'Engagements' },
       { to: '/user/documents',        icon: 'docs',      text: 'Upload Documents' },
       { to: '/user/connect-advisor',  icon: 'users',     text: 'Connect Advisor' },
       { to: '/user/consultations',    icon: 'consult',   text: 'Consultations' },
@@ -68,6 +72,7 @@ const navItems = {
       { to: '/advisor/documents',     icon: 'docs',      text: 'Documents' },
       { to: '/advisor/clients',       icon: 'users',     text: 'Clients' },
       { to: '/advisor/schedule',      icon: 'schedule', text: 'Schedule' },
+      { to: '/advisor/engagements',   icon: 'engagements', text: 'Engagements' },
       { to: '/advisor/retainers',     icon: 'retainers', text: 'Retainers' },
       { to: '/advisor/notifications', icon: 'bell',      text: 'Notifications', badge: true },
       { to: '/advisor/settings',      icon: 'settings',  text: 'Settings' },
@@ -80,7 +85,9 @@ const navItems = {
       { to: '/admin/users',      icon: 'users',     text: 'All Users' },
       { to: '/admin/advisors',   icon: 'consult',   text: 'Advisors' },
       { to: '/admin/cases',      icon: 'cases',     text: 'All Cases' },
+      { to: '/admin/leads',      icon: 'leads',     text: 'Leads' },
       { to: '/admin/services',   icon: 'services',  text: 'Services' },
+      { to: '/admin/engagements', icon: 'engagements', text: 'Engagements' },
       { to: '/admin/community',  icon: 'community', text: 'Community' },
       { to: '/admin/documents',  icon: 'docs',      text: 'Documents' },
       { to: '/admin/revenue',    icon: 'revenue',   text: 'Revenue' },

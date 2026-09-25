@@ -15,6 +15,7 @@ function Contact() {
     company: "",
     subject: "",
     message: "",
+    source: "",
   });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -155,6 +156,27 @@ function Contact() {
                             <option>Tax Advisory</option>
                             <option>Pricing & Plans</option>
                             <option>General Inquiry</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-12">
+                        <div className="custom-frm-bx">
+                          <select
+                            name="source"
+                            className="form-select"
+                            value={form.source}
+                            onChange={(e) => set("source", e.target.value)}
+                          >
+                            <option value="">How did you hear about us? (optional)</option>
+                            <option value="referral">Referral</option>
+                            <option value="social">Social media</option>
+                            <option value="event">Event</option>
+                            <option value="webinar">Webinar</option>
+                            <option value="diaspora">Diaspora group</option>
+                            <option value="trade_mission">Trade mission</option>
+                            <option value="partner">Partner introduction</option>
+                            <option value="website">Website / search</option>
                           </select>
                         </div>
                       </div>

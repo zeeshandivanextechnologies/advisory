@@ -73,8 +73,48 @@ const sendReceipt = async (result) => {
   });
 };
 
+// Engagement invoices (deposit / final) paid online
+const startInvoiceCheckout = async (userId, invoiceId) => {
+  if ((await gateway()) !== 'stripe') {
+    throw new HttpError(400, 'Online payment is not enabled. Please pay by bank transfer using the invoice details.');
+  }
+  const stripeApi = client();
+  const inv = await rpc('api_invoice_for_checkout', { p_invoice_id: invoiceId }, userId);
+  const currency = String(inv.currency || 'USD').toLowerCase();
+
+  const session = await stripeApi.checkout.sessions.create({
+    mode: 'payment',
+    customer_email: inv.email,
+    client_reference_id: userId,
+    line_items: [{
+      quantity: 1,
+      price_data: {
+        currency,
+        unit_amount: toMinor(inv.amount, currency),
+        product_data: { name: `${inv.title} — ${inv.kind === 'deposit' ? 'deposit' : 'final payment'} (${inv.invoice_no})` },
+      },
+    }],
+    metadata: { engagement_invoice_id: String(inv.id), user_id: userId },
+    success_url: `${env.frontendUrl}/user/engagements?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${env.frontendUrl}/user/engagements?checkout=cancelled`,
+  });
+  return { redirect_url: session.url, invoice_id: inv.id };
+};
+
 // Completes the payment behind a paid Checkout Session (webhook and success redirect)
 const completeFromSession = async (session) => {
+  const invoiceId = Number(session.metadata?.engagement_invoice_id);
+  if (invoiceId && session.payment_status === 'paid') {
+    const { rows } = await pool.query('select public._pay_engagement_invoice($1, $2, $3) as r', [invoiceId, 'card', session.id]);
+    const result = rows[0].r;
+    if (!result.already_paid) {
+      // Lazy require: the journey controller also depends on this module
+      require('../controllers/journey.controller').afterInvoicePaid(invoiceId)
+        .catch((err) => console.error('[mail] invoice payment emails failed:', err.message));
+    }
+    return result;
+  }
+
   const paymentId = Number(session.metadata?.payment_id);
   if (!paymentId || session.payment_status !== 'paid') return null;
   const { rows } = await pool.query('select public._complete_payment($1, $2) as r', [paymentId, session.id]);
@@ -109,4 +149,4 @@ const handleWebhook = async (rawBody, signature) => {
   }
 };
 
-module.exports = { gateway, startCheckout, confirmSession, handleWebhook, sendReceipt };
+module.exports = { gateway, startCheckout, startInvoiceCheckout, confirmSession, handleWebhook, sendReceipt };

@@ -202,6 +202,26 @@ export const communityAPI = {
   adminDeleteBrief:    (id)         => api.delete(`/admin/community/briefs/${id}`),
 };
 
+/* ── Client journey: proposals, engagements, invoices, follow-ups ── */
+export const journeyAPI = {
+  getMyProposals:        ()               => api.get('/proposals'),
+  respondProposal:       (id, data)       => api.put(`/proposals/${id}/respond`, data),
+  getEngagements:        (p)              => api.get('/engagements', { params: p }),
+  getEngagement:         (id)             => api.get(`/engagements/${id}`),
+  updateEngagement:      (id, data)       => api.put(`/engagements/${id}`, data),
+  addQaItem:             (id, label)      => api.post(`/engagements/${id}/qa`, { label }),
+  setQaItem:             (itemId, checked) => api.put(`/engagement-qa/${itemId}`, { checked }),
+  payInvoiceOnline:      (id)             => api.post(`/engagement-invoices/${id}/pay`),
+  adminGetProposals:     (p)              => api.get('/admin/proposals', { params: p }),
+  adminSaveProposal:     (id, data)       => id ? api.put(`/admin/proposals/${id}`, data) : api.post('/admin/proposals', data),
+  adminSendProposal:     (id)             => api.post(`/admin/proposals/${id}/send`),
+  adminWithdrawProposal: (id)             => api.post(`/admin/proposals/${id}/withdraw`),
+  adminGetInvoices:      (p)              => api.get('/admin/engagement-invoices', { params: p }),
+  adminRecordPayment:    (id, data)       => api.post(`/admin/engagement-invoices/${id}/payment`, data),
+  adminGetFollowups:     (p)              => api.get('/admin/followups', { params: p }),
+  adminUpdateFollowup:   (id, data)       => api.put(`/admin/followups/${id}`, data),
+};
+
 /* ── Public (no login needed) ──────────────────────────────── */
 export const publicAPI = {
   getSettings: ()     => api.get('/settings'),

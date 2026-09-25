@@ -24,6 +24,9 @@ const p = (text) => `<p style="margin:0 0 14px;font-size:15px;line-height:1.5">$
 const button = (href, label) =>
   `<p style="margin:20px 0"><a href="${esc(href)}" style="background:#111827;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:6px;font-weight:bold;display:inline-block">${esc(label)}</a></p>`;
 
+// Shared with journeyEmails.js
+exports.helpers = { layout, p, button, esc };
+
 const fmtDate = (iso) => new Date(iso).toLocaleString('en-GB', {
   timeZone: 'Asia/Qatar', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
 }) + ' (AST)';
@@ -101,8 +104,10 @@ exports.contactAck = ({ name }) => ({
   html: layout('Thanks for reaching out', [
     p(`Hi ${esc(name)},`),
     p('We have received your message and will reply within 4–6 working hours.'),
+    p('To make our first call as useful as possible, please create your account and complete the short intake form (industry, stage, capital, documents, timeline and your main question):'),
+    button(`${env.frontendUrl}/auth/register`, 'Complete the intake form'),
   ].join('')),
-  text: `Hi ${name}, we received your message and will reply within 4–6 working hours.`,
+  text: `Hi ${name}, we received your message and will reply within 4–6 working hours. Complete the short intake form: ${env.frontendUrl}/auth/register`,
 });
 
 exports.contactAdmin = ({ name, email, company, subject, message }) => ({
@@ -153,7 +158,8 @@ exports.serviceRequestAck = ({ name, offering }) => ({
   html: layout('Request received', [
     p(`Hi ${esc(name)},`),
     p(`Thank you for your interest in <b>${esc(offering)}</b>. We will reply within 4–6 working hours with next steps.`),
-    button(`${env.frontendUrl}/user/services`, 'View my requests'),
+    p('Before our call, please complete the short intake form — it takes about 5 minutes:'),
+    button(`${env.frontendUrl}/user/intake`, 'Complete the intake form'),
   ].join('')),
   text: `We received your request for ${offering} and will reply within 4–6 working hours.`,
 });

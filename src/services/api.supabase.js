@@ -296,6 +296,27 @@ export const communityAPI = {
   adminDeleteBrief:    (id)         => rpc('api_admin_delete_brief', { p_id: Number(id) }).then(ok),
 };
 
+/* ── Client journey: proposals, engagements, invoices, follow-ups ── */
+export const journeyAPI = {
+  getMyProposals:        ()               => rpc('api_my_proposals').then(ok),
+  respondProposal:       (id, data)       => rpc('api_respond_proposal', { p_id: Number(id), p: data }).then(ok),
+  getEngagements:        (p = {})         => rpc('api_engagements', { p }).then(ok),
+  getEngagement:         (id)             => rpc('api_engagement_detail', { p_id: Number(id) }).then(ok),
+  updateEngagement:      (id, data)       => rpc('api_update_engagement', { p_id: Number(id), p: data }).then(ok),
+  addQaItem:             (id, label)      => rpc('api_add_qa_item', { p_engagement_id: Number(id), p_label: label }).then(ok),
+  setQaItem:             (itemId, checked) => rpc('api_set_qa_item', { p_item_id: Number(itemId), p_checked: !!checked }).then(ok),
+  // Online checkout needs the Express server
+  payInvoiceOnline:      ()               => Promise.reject(toError('Online payment is not available. Please pay by bank transfer.')),
+  adminGetProposals:     (p = {})         => rpc('api_admin_proposals', { p }).then(ok),
+  adminSaveProposal:     (id, data)       => rpc('api_admin_save_proposal', { p_id: id ? Number(id) : null, p: data }).then(ok),
+  adminSendProposal:     (id)             => rpc('api_admin_send_proposal', { p_id: Number(id) }).then(ok),
+  adminWithdrawProposal: (id)             => rpc('api_admin_withdraw_proposal', { p_id: Number(id) }).then(ok),
+  adminGetInvoices:      (p = {})         => rpc('api_admin_invoices', { p }).then(ok),
+  adminRecordPayment:    (id, data)       => rpc('api_admin_record_invoice_payment', { p_invoice_id: Number(id), p: data }).then(ok),
+  adminGetFollowups:     (p = {})         => rpc('api_admin_followups', { p }).then(ok),
+  adminUpdateFollowup:   (id, data)       => rpc('api_admin_update_followup', { p_id: Number(id), p: data }).then(ok),
+};
+
 /* ── Public (no login needed) ──────────────────────────────── */
 export const publicAPI = {
   getSettings: ()     => rpc('api_public_settings').then(ok),

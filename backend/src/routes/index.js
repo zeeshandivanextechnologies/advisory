@@ -12,6 +12,7 @@ const documents = require('../controllers/documents.controller');
 const admin = require('../controllers/admin.controller');
 const misc = require('../controllers/misc.controller');
 const services = require('../controllers/services.controller');
+const journey = require('../controllers/journey.controller');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: env.maxUploadBytes } });
 const router = Router();
@@ -107,6 +108,16 @@ router.get('/community/events', h(services.events));
 router.put('/community/events/:id/rsvp', h(services.rsvp));
 router.get('/community/briefs', h(services.briefs));
 
+/* ── Client journey: proposals, engagements, invoices ────── */
+router.get('/proposals', h(journey.myProposals));
+router.put('/proposals/:id/respond', h(journey.respondProposal));
+router.get('/engagements', h(journey.engagements));
+router.get('/engagements/:id', h(journey.engagementDetail));
+router.put('/engagements/:id', h(journey.updateEngagement));
+router.post('/engagements/:id/qa', h(journey.addQaItem));
+router.put('/engagement-qa/:itemId', h(journey.setQaItem));
+router.post('/engagement-invoices/:id/pay', h(journey.payInvoiceOnline));
+
 /* ── Admin ──────────────────────────────────────────────── */
 router.get('/admin/dashboard', h(admin.dashboard));
 router.get('/admin/users', h(admin.users));
@@ -135,5 +146,14 @@ router.delete('/admin/community/events/:id', h(services.adminDeleteEvent));
 router.post('/admin/community/briefs', h(services.adminCreateBrief));
 router.put('/admin/community/briefs/:id', h(services.adminUpdateBrief));
 router.delete('/admin/community/briefs/:id', h(services.adminDeleteBrief));
+router.get('/admin/proposals', h(journey.adminProposals));
+router.post('/admin/proposals', h(journey.adminCreateProposal));
+router.put('/admin/proposals/:id', h(journey.adminUpdateProposal));
+router.post('/admin/proposals/:id/send', h(journey.adminSendProposal));
+router.post('/admin/proposals/:id/withdraw', h(journey.adminWithdrawProposal));
+router.get('/admin/engagement-invoices', h(journey.adminInvoices));
+router.post('/admin/engagement-invoices/:id/payment', h(journey.adminRecordPayment));
+router.get('/admin/followups', h(journey.adminFollowups));
+router.put('/admin/followups/:id', h(journey.adminUpdateFollowup));
 
 module.exports = router;

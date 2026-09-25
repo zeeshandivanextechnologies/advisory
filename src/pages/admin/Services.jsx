@@ -1,8 +1,9 @@
 import { FiArrowRight, FiClock, FiInbox } from 'react-icons/fi';
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, EmptyState, SearchInput, Pagination, Modal, showToast } from '../../components/common/index';
-import { serviceAPI, adminAPI } from '../../services/api';
+import { serviceAPI, adminAPI, intakeAPI, journeyAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { LogHoursModal, RetainerLogModal } from '../../components/services/RetainerModals';
 import {
@@ -26,6 +27,8 @@ const Footer = ({ onCancel, onSave, saving, label = 'Save' }) => (
 
 /* ═══ Requests ═══════════════════════════════════════════════ */
 function RequestsTab({ onRetainerCreated }) {
+  const navigate              = useNavigate();
+  const [intake, setIntake]   = useState(null);
   const [rows, setRows]       = useState([]);
   const [meta, setMeta]       = useState({ total: 0, page: 1, limit: 20 });
   const [status, setStatus]   = useState('');
@@ -43,6 +46,24 @@ function RequestsTab({ onRetainerCreated }) {
   }, [status, search]);
 
   useEffect(() => { load(1); }, [load]);
+
+  // Show the client's pre-call intake next to the request
+  useEffect(() => {
+    setIntake(null);
+    if (edit?.user_id) intakeAPI.get(edit.user_id).then(r => setIntake(r.data.data || false)).catch(() => setIntake(false));
+  }, [edit?.user_id]);
+
+  // Step 5: draft a proposal pre-filled from the request and its service
+  const createProposal = async () => {
+    setSaving(true);
+    try {
+      const r = await journeyAPI.adminSaveProposal(null, { request_id: edit.id, amount: edit.quoted_amount || '' });
+      setEdit(null);
+      navigate('/admin/engagements', { state: { tab: 'proposals', proposalId: r.data.data.id } });
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not create proposal', 'error');
+    } finally { setSaving(false); }
+  };
 
   const save = async () => {
     setSaving(true);
@@ -134,6 +155,23 @@ function RequestsTab({ onRetainerCreated }) {
               <textarea className="form-input" style={{ height: 80, resize: 'vertical' }} value={edit.admin_notes || ''}
                 onChange={e => setEdit(p => ({ ...p, admin_notes: e.target.value }))} />
             </Field>
+            <div className="col-12">
+              <label className="form-label">Client intake</label>
+              {intake === null ? <Spinner size={20} center={false} /> : intake ? (
+                <div style={{ fontSize: 12, color: '#4A4949', lineHeight: 1.7 }}>
+                  {[['Industry', intake.industry], ['Country', intake.country_of_origin], ['Target market', intake.target_market],
+                    ['Stage', intake.business_stage], ['Capital', intake.capital_range], ['Documents', intake.documents_ready],
+                    ['Timeline', intake.timeline]].filter(([, v]) => v).map(([k, v]) => <div key={k}><b style={{ color: '#000' }}>{k}:</b> {v}</div>)}
+                  {intake.main_question && <div><b style={{ color: '#000' }}>Main question:</b> {intake.main_question}</div>}
+                  {intake.needs?.length > 0 && <div><b style={{ color: '#000' }}>Needs:</b> {intake.needs.join(', ')}</div>}
+                </div>
+              ) : <p style={{ fontSize: 12, color: 'var(--orange)', marginBottom: 0 }}>Intake not completed yet.</p>}
+            </div>
+            {OPEN_REQUEST.includes(edit.status) && (
+              <div className="col-12">
+                <button className="thm-btn" disabled={saving} onClick={createProposal}>Create Proposal / SOW</button>
+              </div>
+            )}
             {edit.offering_slug === 'executive-advisory-retainer' && OPEN_REQUEST.includes(edit.status) && (
               <div className="col-12">
                 <button className="ai-thm-btn outline" disabled={saving} onClick={startRetainer}>Start Retainer for this Client</button>

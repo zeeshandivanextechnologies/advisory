@@ -35,6 +35,9 @@ import VideoCall         from './pages/user/VideoCall';
 import Plans             from './pages/user/Plans';
 import UserServices      from './pages/user/Services';
 import UserCommunity     from './pages/user/Community';
+import UserEngagements   from './pages/user/Engagements';
+import UserIntake        from './pages/user/Intake';
+import CaseWorkspacePage from './pages/CaseWorkspacePage';
 
 import AdvisorLayout        from './components/layout/AdvisorLayout';
 import AdvisorDashboard     from './pages/advisor/Dashboard';
@@ -44,6 +47,7 @@ import AdvisorSchedule      from './pages/advisor/Schedule';
 import AdvisorNotifications from './pages/advisor/Notifications';
 import AdvisorSettings      from './pages/advisor/Settings';
 import AdvisorRetainers     from './pages/advisor/Retainers';
+import AdvisorEngagements   from './pages/advisor/Engagements';
 
 import AdminLayout    from './components/layout/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
@@ -55,6 +59,8 @@ import AdminRevenue   from './pages/admin/Revenue';
 import AdminSettings  from './pages/admin/Settings';
 import AdminServices  from './pages/admin/Services';
 import AdminCommunity from './pages/admin/Community';
+import AdminEngagements from './pages/admin/Engagements';
+import AdminLeads     from './pages/admin/Leads';
 import Home from './pages/Landing/Home';
 import LandingLayout from './pages/Landing/LandingLayout';
 import Boarding from './pages/onboarding/Boarding';
@@ -133,6 +139,9 @@ function AppRoutes() {
         <Route path="plans"             element={<ErrorBoundary><Plans /></ErrorBoundary>} />
         <Route path="services"          element={<ErrorBoundary><UserServices /></ErrorBoundary>} />
         <Route path="community"         element={<ErrorBoundary><UserCommunity /></ErrorBoundary>} />
+        <Route path="engagements"       element={<ErrorBoundary><UserEngagements /></ErrorBoundary>} />
+        <Route path="intake"            element={<ErrorBoundary><UserIntake /></ErrorBoundary>} />
+        <Route path="cases/:id"         element={<ErrorBoundary><CaseWorkspacePage /></ErrorBoundary>} />
       </Route>
 
       <Route path="/user/video-call/:id" element={<ProtectedRoute roles={['user','advisor']}><VideoCall /></ProtectedRoute>} />
@@ -148,6 +157,8 @@ function AppRoutes() {
         <Route path="notifications" element={<ErrorBoundary><AdvisorNotifications /></ErrorBoundary>} />
         <Route path="settings"      element={<ErrorBoundary><AdvisorSettings /></ErrorBoundary>} />
         <Route path="retainers"     element={<ErrorBoundary><AdvisorRetainers /></ErrorBoundary>} />
+        <Route path="engagements"   element={<ErrorBoundary><AdvisorEngagements /></ErrorBoundary>} />
+        <Route path="cases/:id"     element={<ErrorBoundary><CaseWorkspacePage /></ErrorBoundary>} />
       </Route>
 
       {/* ── Admin ── */}
@@ -162,6 +173,9 @@ function AppRoutes() {
         <Route path="settings"      element={<ErrorBoundary><AdminSettings /></ErrorBoundary>} />
         <Route path="services"      element={<ErrorBoundary><AdminServices /></ErrorBoundary>} />
         <Route path="community"     element={<ErrorBoundary><AdminCommunity /></ErrorBoundary>} />
+        <Route path="engagements"   element={<ErrorBoundary><AdminEngagements /></ErrorBoundary>} />
+        <Route path="leads"         element={<ErrorBoundary><AdminLeads /></ErrorBoundary>} />
+        <Route path="cases/:id"     element={<ErrorBoundary><CaseWorkspacePage /></ErrorBoundary>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -29,6 +29,7 @@ const parseSpecs = (raw) => {
 
 const SESSION_TYPES = [
   { label: 'Video Consultation (60 min)', medium: 'video', duration: 60 },
+  { label: 'Discovery Call — Video (45 min)', medium: 'video', duration: 45 },
   { label: 'Video Consultation (90 min)', medium: 'video', duration: 90 },
   { label: 'Phone Consultation (30 min)', medium: 'phone', duration: 30 },
   { label: 'Phone Consultation (60 min)', medium: 'phone', duration: 60 },

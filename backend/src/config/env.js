@@ -26,6 +26,8 @@ module.exports = {
 
   // Session reminder emails, checked every minute
   remindersEnabled: process.env.SESSION_REMINDERS !== 'false',
+  // Hourly client-journey jobs (invoice reminders, follow-ups, Friday nudges)
+  journeyJobsEnabled: process.env.JOURNEY_JOBS !== 'false',
 
   appName: process.env.APP_NAME || 'AunAdvisory',
   // Receives contact-form inquiries; empty = don't forward

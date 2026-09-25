@@ -39,7 +39,8 @@ backend/
     │   ├── 0002_client_journey.sql
     │   ├── 0003_auth_codes.sql
     │   ├── 0004_pending_features.sql
-    │   └── 0005_services_catalog.sql
+    │   ├── 0005_services_catalog.sql
+    │   └── 0006_client_journey_engagements.sql
     ├── templates/            auth emails (6-digit signup code, password reset)
     └── seed.sql
 ```
@@ -137,6 +138,26 @@ When Admin → Settings → Maintenance Mode is on:
   - Integra Innovators and Gold memberships are invite-only; the member accepts the invitation.
   - Events can be for everyone, members only or Gold members only, with RSVP and an optional capacity.
   - Monthly Market Briefs can go to everyone, retainer clients or members. Publishing one notifies that audience.
+
+### Client journey (migration `0006`)
+| Step | What happens |
+|---|---|
+| 1 Lead | The contact form stores a lead with its source. Admins manage leads under Admin → Leads |
+| 2 Auto-reply | Sent immediately, with a link to the intake form. WhatsApp is not included; it needs a WhatsApp Business API account |
+| 3 Intake | The client fills in `/user/intake`. Admins see it on the service request |
+| 4 Discovery call | 45-minute session type. The advisor records go / no-go / nurture / refer and the next step (Schedule → Outcome) |
+| 5 Proposal/SOW | Admin → Engagements → Proposals: scope, deliverables, boundaries, timeline, price, deposit % and terms. Validity must be 15–30 days |
+| 6 Contract + deposit | The client signs by typing their name and ticking "agree". This creates a deposit invoice due in 5 business days. No work starts before the deposit is paid |
+| 7 Kickoff | Paying the deposit creates the case workspace (5 phases and a kickoff checklist), seeds the 7-point QA list and emails the welcome packet |
+| 8 Delivery | Kanban phases and status updates live in the workspace. On Fridays, staff are nudged if an engagement had no update that week |
+| 9 QA | Delivery is blocked until every QA item is ticked. A warning shows if QA finished less than 24 hours earlier |
+| 10 Handover | Recording link, action items and notes are saved on the consultation, and the client gets an email |
+| 11 Final invoice | Issued when delivery is marked done. Reminders go out on days 7, 14 and 15 |
+| 12 Follow-ups | Scheduled when the final payment lands: day 7, 30, 60, 90 (referral ask) and 180. Admins log the outcome |
+
+- Invoices are paid either by the admin recording a payment or online through Stripe, when the gateway is Stripe.
+- Every payment is also written to `payments`, so Revenue includes it.
+- Jobs run hourly. Set `JOURNEY_JOBS=false` to turn them off.
 
 ### Endpoints (all under `/api`)
 Every response is `{ success, data }` (lists add `meta`) or `{ success:false, message }`. Protected endpoints need `Authorization: Bearer <token>`.
