@@ -1,0 +1,524 @@
+@media (min-width: 1920px) {
+}
+
+@media (max-width: 1699px) {
+  .container {
+    max-width: 1440px;
+  }
+}
+
+@media (max-width: 1399px) {
+  .login-container {
+    padding: 50px 50px 0px 50px;
+  }
+
+  .service-section {
+    height: 700px;
+  }
+
+  .register-btn-list {
+    flex-wrap: wrap;
+  }
+  .aun-hero-section{
+    height: 650px;
+  }
+}
+
+@media (max-width: 1199px) {
+}
+
+@media (max-width: 991px) {
+  /* reponsive header*/
+  .navbar-light-box .navbar-toggler {
+    color: black;
+  }
+
+  .navbar-light-box .navbar-toggler:focus {
+    box-shadow: none !important;
+  }
+
+  .navbar-light-box .collapse:not(.show) {
+    display: block !important;
+    height: 100% !important;
+    visibility: visible !important;
+  }
+
+  .navbar-light-box .collapsing {
+    height: 100% !important;
+    transition: none !important;
+  }
+
+  #navbarSupportedContent {
+    position: fixed !important;
+    top: 0;
+    left: -100%;
+    width: 300px;
+    height: 100vh;
+    background: #fff;
+    padding: 20px 15px;
+    transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 99999;
+    overflow-y: auto;
+  }
+
+  #navbarSupportedContent.show {
+    left: 0;
+  }
+
+  .navbar-menu-list {
+    gap: 5px;
+  }
+
+  .navbar-light-box .navbar-nav .nav-link {
+    margin: 0px 0;
+  }
+
+  .navbar-light-box .navbar-nav .nav-item {
+  }
+
+  .mega-menu {
+    display: none;
+    position: static;
+    width: 100%;
+  }
+
+  .mega-dropdown.show .mega-menu {
+    display: block;
+  }
+
+  .mega-menu {
+    transform: translateX(0);
+  }
+
+  .mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 9998;
+    animation: fadeIn 0.35s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  .mobile-close-btn {
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    text-align: right;
+    color: #000;
+    padding-right: 5px;
+  }
+
+  .mobile-close-btn svg {
+    transition: transform 0.25s ease;
+  }
+
+  .navbar-toggler {
+    border: none;
+    z-index: 10000;
+  }
+
+  /* reponsive header*/
+
+  .home-section {
+    height: 450px;
+  }
+
+  .home-content h2 {
+    font-size: 40px;
+    line-height: 100%;
+  }
+
+  .home-content p {
+    font-size: 16px;
+  }
+
+  .feedback-section {
+    padding: 30px 0;
+  }
+
+  .feedback-card {
+    padding: 20px;
+  }
+
+  .feedback-icon {
+    font-size: 30px;
+  }
+
+  .feedback-content p {
+    font-size: 16px;
+  }
+
+  .first_para {
+    font-size: 28px;
+    margin-bottom: 0px !important;
+  }
+
+  /* Aunai AI Legal */
+  .right-login-list {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .right-login-list .thm-btn {
+    width: 100%;
+  }
+
+  .right-login-list .login-item {
+    width: 100%;
+  }
+
+  .aunai-banner-section {
+    height: auto;
+  }
+
+  .anuai-hp-content h2 {
+    font-size: 48px;
+    line-height: 120%;
+  }
+
+  .anuai-hp-content p {
+    font-size: 16px;
+  }
+
+  .about-banner img {
+    height: auto;
+  }
+
+  .about-section {
+    padding: 30px 0;
+  }
+
+  .legal-solution {
+    padding: 30px 0;
+  }
+
+  .legal-content h4 {
+    font-size: 32px;
+    padding-bottom: 20px;
+    line-height: 120%;
+  }
+
+  .legal-content p {
+    font-size: 16px;
+    padding-bottom: 20px;
+  }
+
+  .aunai-video-section {
+    padding: 30px 0;
+  }
+
+  .legal-features-section {
+    padding: 30px 0;
+  }
+
+  .legal-features-content h4 {
+    font-size: 32px;
+    line-height: 120%;
+    margin-top: 10px;
+  }
+
+  .timeline-wrapper {
+    display: none;
+  }
+
+  .faq-section {
+    padding: 30px 0;
+  }
+
+  .flow-section {
+    padding: 30px 0;
+  }
+
+  .flow-content h4 {
+    font-size: 32px;
+    line-height: 120%;
+  }
+
+  .footer-section {
+    padding: 0px;
+  }
+
+  .footer-bottom p {
+    text-align: center;
+    line-height: 150%;
+    font-size: 14px;
+  }
+
+  .social-icon-list {
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .sub-title {
+    margin-bottom: 10px;
+  }
+
+  .admin-picture-box img {
+    height: 400px;
+  }
+
+  .admin-picture-box {
+    height: auto;
+  }
+
+  .auth-content {
+    padding: 10px;
+    height: auto;
+    align-content: center;
+  }
+
+  .auth-content h2{
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .auth-content h4 {
+    font-size: 20px;
+    line-height: 100%;
+  }
+
+  .auth-content p{
+    font-size: 16px;
+  }
+
+  .login-container {
+    padding: 30px 0;
+  }
+
+  .lg_sub_content {
+    margin-bottom: 25px !important;
+  }
+
+  .legal-content h2 {
+    font-size: 32px;
+  }
+
+  .legal-section {
+    height: 150px;
+  }
+
+  .ai-contact-picture img {
+    height: 300px;
+  }
+
+  .ai-weekly-edit-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  /* AnuAdivosru Css START */
+
+  .aun-hero-section{
+    height: 400px;
+  }
+
+  .aun-img-box {
+    height: 300px;
+  }
+
+  .aun-hero-title{
+    font-size: 32px;
+    line-height: 100%;
+  }
+
+  .aun-badge-text{
+    font-size: 10px;
+  }
+
+
+  .aun-content-box{
+    max-width: 100%;
+    padding: 8px 10px;
+    bottom: 0;
+  }
+
+  .landing-user-trust{
+    gap: 5px;
+  }
+
+  .landing-user-trust p{
+    font-size: 14px;
+  }
+
+
+  .aun-services-section{
+    padding: 30px 0;
+  }
+
+  #about{
+    padding: 30px 0 !important;
+  }
+
+  #pricing{
+    padding: 30px 0 !important;
+  }
+
+  .anu-testimonial-section{
+    padding: 30px 0;
+  }
+
+  .aun-cta-title{
+    font-size: 30px;
+    text-align: center;
+  }
+
+
+
+  .legal-page-title h1{
+    font-size: 30px;
+  }
+
+  .aun-hero-btns{
+    justify-content: center;
+  }
+
+  .otp-filed-box{
+    gap: 10px;
+  }
+
+  .feature-grid{
+        grid-template-columns: 1fr;
+  }
+
+    .aun-needs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-need-cards{
+    padding: 10px;
+  }
+
+  .onboarding-need-content h2{
+    font-size: 24px;
+  }
+
+  /* AnuAdivosru Css END */
+
+}
+
+@media (max-width: 767px) {
+  .footer-bottom {
+    justify-content: center;
+  }
+
+  .otp-input {
+    width: 48px;
+  }
+
+  .otp-wrapper {
+    gap: 8px;
+  }
+
+  .register-btn {
+    padding: 10px 15px;
+    gap: 5px;
+    font-size: 14px;
+  }
+
+  .social-nav-link {
+    font-size: 14px;
+  }
+
+  .aunai-title h2 {
+    font-size: 100px;
+  }
+
+  .legal-solution::after {
+    width: 300px;
+  }
+
+  .onboarding-header {
+    padding:  10px;
+  }
+
+  .expert-section {
+    padding: 50px 0;
+  }
+
+  .guidance-content {
+    padding-left: 0;
+    margin-bottom: 20px;
+  }
+
+  .onboarding-content {
+    padding: 70px 0px;
+  }
+
+  .onboarding-content h2 {
+    font-size: 36px;
+  }
+
+  .onboarding-content h6 {
+    font-size: 16px;
+    padding-bottom: 20px;
+  }
+
+  .tag-list {
+    gap: 5px;
+  }
+  .step-footer {
+    padding: 50px 0 20px 0;
+  }
+
+  .guidance-content h2 {
+    font-size: 36px;
+    text-align: center;
+  }
+
+  .guidance-content p {
+    font-size: 16px;
+    text-align: center;
+    padding-bottom: 20px;
+  }
+
+  .ai-chat-picture img {
+    object-fit: contain;
+    height: auto;
+  }
+
+  .experts-picture img {
+    height: auto;
+  }
+  .guidance-section {
+    padding: 20px 0;
+  }
+
+  .contact-us-content {
+    justify-content: space-between;
+  }
+
+  .ai-contact-content h4 {
+    font-size: 12px;
+  }
+
+  .ai-contact-content h6 {
+    font-size: 12px;
+  }
+
+  #advisors{
+    padding: 40px 0 !important;
+  }
+
+  .advisor-content-page{
+    padding-top: 10px;
+  }
+
+  .advisor-content-page p{
+    margin-bottom: 10px !important;
+  }
+
+}
+
+@media (max-width: 576px) {
+}
