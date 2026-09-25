@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, EmptyState, SearchInput, Pagination, Modal, showToast } from '../../components/common/index';
-import { adminAPI } from '../../services/api';
+import { adminAPI, aiAPI } from '../../services/api';
+import { AiButton, AiReviewNote } from '../../components/journey/AiPanels';
 import { fmtDateTime } from '../../utils/services';
 import { LEAD_SOURCES, LEAD_STATUSES, leadSourceLabel } from '../../utils/journey';
 import { FiInbox } from 'react-icons/fi';
@@ -19,6 +20,20 @@ export default function AdminLeads() {
   const [loading, setLoading] = useState(true);
   const [edit, setEdit]       = useState(null);
   const [saving, setSaving]   = useState(false);
+  const [reply, setReply]     = useState(null);
+  const [aiBusy, setAiBusy]   = useState(false);
+
+  useEffect(() => { setReply(null); }, [edit?.id]);
+
+  const draftReply = async () => {
+    setAiBusy(true);
+    try {
+      const r = await aiAPI.leadReply(edit.id);
+      setReply(r.data.data);
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not draft a reply', 'error');
+    } finally { setAiBusy(false); }
+  };
 
   const load = useCallback((page = 1) => {
     setLoading(true);
@@ -101,7 +116,12 @@ export default function AdminLeads() {
       <Modal open={!!edit} onClose={() => setEdit(null)} title={edit ? `${edit.name}${edit.company ? ` — ${edit.company}` : ''}` : 'Lead'}
         footer={
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            {edit && <a className="ai-thm-btn outline" href={`mailto:${edit.email}?subject=${encodeURIComponent(`Re: ${edit.subject || 'Your inquiry'}`)}`}>Reply by email</a>}
+            {edit && (
+              <a className="ai-thm-btn outline"
+                href={`mailto:${edit.email}?subject=${encodeURIComponent(reply?.reply_subject || `Re: ${edit.subject || 'Your inquiry'}`)}${reply?.reply_body ? `&body=${encodeURIComponent(reply.reply_body)}` : ''}`}>
+                Reply by email
+              </a>
+            )}
             <button className="ai-thm-btn outline" onClick={() => setEdit(null)}>Cancel</button>
             <button className="ai-thm-btn" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
           </div>
@@ -111,6 +131,22 @@ export default function AdminLeads() {
             <div className="col-12">
               <label className="form-label">Message</label>
               <p style={{ fontSize: 13, color: '#4A4949', whiteSpace: 'pre-wrap', marginBottom: 0 }}>{edit.message}</p>
+            </div>
+            <div className="col-12">
+              <AiButton onClick={draftReply} busy={aiBusy}>{reply ? 'Redraft reply' : 'Summarise & draft reply with AI'}</AiButton>
+              {reply && (
+                <div style={{ marginTop: 8 }}>
+                  <AiReviewNote />
+                  <p style={{ fontSize: 12, color: '#4A4949', marginBottom: 6 }}><b style={{ color: '#000' }}>Summary:</b> {reply.summary}</p>
+                  {reply.suggested_status && reply.suggested_status !== edit.status && (
+                    <button type="button" className="ai-thm-btn outline" style={{ marginBottom: 6 }} onClick={() => setEdit(p => ({ ...p, status: reply.suggested_status }))}>
+                      Apply suggested status: {statusLabel(reply.suggested_status)}
+                    </button>
+                  )}
+                  <input className="form-input" style={{ marginBottom: 6 }} value={reply.reply_subject} onChange={e => setReply(r => ({ ...r, reply_subject: e.target.value }))} />
+                  <textarea className="form-input" style={{ height: 150, resize: 'vertical' }} value={reply.reply_body} onChange={e => setReply(r => ({ ...r, reply_body: e.target.value }))} />
+                </div>
+              )}
             </div>
             <div className="col-md-6 form-group">
               <label className="form-label">Status</label>

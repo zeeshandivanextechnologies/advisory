@@ -29,6 +29,9 @@ module.exports = {
   // Hourly client-journey jobs (invoice reminders, follow-ups, Friday nudges)
   journeyJobsEnabled: process.env.JOURNEY_JOBS !== 'false',
 
+  // AI drafting (Claude). The SDK reads ANTHROPIC_API_KEY itself.
+  aiModel: process.env.AI_MODEL || 'claude-opus-5',
+
   appName: process.env.APP_NAME || 'AunAdvisory',
   // Receives contact-form inquiries; empty = don't forward
   adminEmail: process.env.ADMIN_EMAIL || '',

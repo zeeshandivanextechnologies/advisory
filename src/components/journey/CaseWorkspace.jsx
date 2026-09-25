@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Badge, Spinner, EmptyState, Modal, showToast } from '../common/index';
 import { caseWorkspaceAPI } from '../../services/api';
 import { fmtDate, fmtDateTime } from '../../utils/services';
+import { ChecklistSuggestions } from './AiPanels';
 import { FiCheckSquare, FiSquare, FiPlus, FiFlag } from 'react-icons/fi';
 
 const COLUMNS = [
@@ -80,7 +81,7 @@ export default function CaseWorkspace({ caseId }) {
   return (
     <>
       {/* Header */}
-      <div className="advisor-legal-cards mb-3">
+      <div className="advisor-legal-cards mb-3 h-auto">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
           <div>
             <h3 style={{ fontSize: 18, fontFamily: 'var(--font-h)', fontWeight: 600, color: '#000', marginBottom: 2 }}>{detail.title}</h3>
@@ -101,13 +102,13 @@ export default function CaseWorkspace({ caseId }) {
       </div>
 
       {/* Kanban */}
-      <div className="advisor-legal-cards mb-3">
+      <div className="advisor-legal-cards mb-3 h-auto">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <h4 style={{ fontSize: 16, fontFamily: 'var(--font-h)', fontWeight: 600, color: '#000', marginBottom: 0 }}>Delivery Phases</h4>
           {staff && <button className="thm-btn" onClick={() => setMilestone({ title: '', phase: '', status: 'pending', due_date: '', description: '' })}><FiPlus /> Add Phase</button>}
         </div>
         {milestones.length === 0 ? (
-          <p style={{ fontSize: 13, color: 'var(--text-dark-4)', marginBottom: 0 }}>No phases yet.</p>
+          <p style={{ fontSize: 13, color: 'var(--text-dark-4)', marginBottom: 0, textAlign : 'center' }}>No phases yet.</p>
         ) : (
           <div className="row g-2">
             {COLUMNS.map(col => {
@@ -166,7 +167,11 @@ export default function CaseWorkspace({ caseId }) {
                   {i.description && <div style={{ fontSize: 12, color: '#4A4949' }}>{i.description}</div>}
                 </div>
               </div>
-            )) : <p style={{ fontSize: 13, color: 'var(--text-dark-4)', marginBottom: 0 }}>No checklist items.</p>}
+            )) : <p style={{ fontSize: 13, color: 'var(--text-dark-4)', marginBottom: 0,  textAlign : 'center' }}>No checklist items.</p>}
+            {staff && (
+              <ChecklistSuggestions caseId={caseId}
+                onAdd={(i) => run(() => caseWorkspaceAPI.saveChecklistItem(caseId, null, { title: i.title, description: i.description }), 'Checklist item added')} />
+            )}
           </div>
         </div>
 
@@ -187,7 +192,7 @@ export default function CaseWorkspace({ caseId }) {
                 {u.next_steps && <p style={{ fontSize: 12, color: '#4A4949', marginBottom: 2 }}><b>Next steps:</b> {u.next_steps}</p>}
                 {u.blockers && <p style={{ fontSize: 12, color: 'var(--red)', marginBottom: 0 }}><b>Blockers:</b> {u.blockers}</p>}
               </div>
-            )) : <p style={{ fontSize: 13, color: 'var(--text-dark-4)', marginBottom: 0 }}>No updates yet. Updates are posted every Friday.</p>}
+            )) : <p style={{ fontSize: 13, color: 'var(--text-dark-4)', marginBottom: 0,  textAlign : 'center' }}>No updates yet. Updates are posted every Friday.</p>}
           </div>
         </div>
       </div>

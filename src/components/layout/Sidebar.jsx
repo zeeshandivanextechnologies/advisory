@@ -13,6 +13,8 @@ import { FiBell } from "react-icons/fi";
 import { FiSettings } from "react-icons/fi";
 import { FiLayers, FiGlobe, FiClock } from "react-icons/fi";
 import { FiClipboard, FiInbox } from "react-icons/fi";
+import { FiUserCheck } from "react-icons/fi";
+import { SCOPE_PAGES } from '../../utils/team';
 
 
 // const Icon = ({ d, extraPath }) => (
@@ -47,6 +49,7 @@ const ICONS = {
   retainers: <FiClock />,
   engagements: <FiClipboard />,
   leads:     <FiInbox />,
+  team:      <FiUserCheck />,
 };
 
 const navItems = {
@@ -91,6 +94,7 @@ const navItems = {
       { to: '/admin/community',  icon: 'community', text: 'Community' },
       { to: '/admin/documents',  icon: 'docs',      text: 'Documents' },
       { to: '/admin/revenue',    icon: 'revenue',   text: 'Revenue' },
+      { to: '/admin/team',       icon: 'team',      text: 'Team' },
       { to: '/admin/settings',   icon: 'settings',  text: 'Settings' },
     ]},
   ],
@@ -105,7 +109,10 @@ const avatarColors = {
 export default function Sidebar({ unread = 0 }) {
   const { user, logout } = useAuth();
   const navigate         = useNavigate();
-  const sections         = navItems[user?.role] || [];
+  // Limited team logins (virtual assistant, content contractor) only see their pages
+  const scope            = user?.role === 'admin' ? (user.admin_scope || 'full') : 'full';
+  const sections         = (navItems[user?.role] || []).map(s => (scope === 'full' ? s
+    : { ...s, links: s.links.filter(l => (SCOPE_PAGES[scope] || []).includes(l.to)) }));
   const avColor          = avatarColors[user?.role] || avatarColors.user;
   const initials         = user?.full_name?.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase() || 'U';
 

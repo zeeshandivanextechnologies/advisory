@@ -41,7 +41,8 @@ backend/
     │   ├── 0004_pending_features.sql
     │   ├── 0005_services_catalog.sql
     │   ├── 0006_client_journey_engagements.sql
-    │   └── 0007_sales_rules.sql
+    │   ├── 0007_sales_rules.sql
+    │   └── 0008_staffing_ai.sql
     ├── templates/            auth emails (6-digit signup code, password reset)
     └── seed.sql
 ```
@@ -76,6 +77,7 @@ REACT_APP_API_URL=http://localhost:5000/api
 | `SMTP_*`, `MAIL_FROM`, `APP_NAME`, `ADMIN_EMAIL` | Outgoing email (see below) |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Online plan payments when the gateway is Stripe (see below) |
 | `SESSION_REMINDERS` | `false` turns off the 30-minute session reminder job |
+| `ANTHROPIC_API_KEY`, `AI_MODEL` | AI drafting with Claude (default model `claude-opus-5`). Server-side only; leave the key empty to disable AI |
 
 ### Email (nodemailer)
 In Express mode the API sends every email itself over SMTP.
@@ -167,6 +169,18 @@ All limits are in Admin → Settings → Sales Rules and are enforced by the dat
 - **Pre-close meetings:** at most three meetings (`sales_max_premeetings`) before a proposal is sent. **Government**, **embassy** and **anchor-referral partners** are exempt. Set the prospect type on a service request.
 - **Proposal shelf life:** 15–30 days (`proposal_valid_min_days` / `proposal_valid_max_days`). An expired proposal moves its request to **nurture** for `sales_nurture_months` (6); after that the request closes automatically. Leads in nurture work the same way.
 - **Fit discipline:** a request for a project offering records a budget range and a documents commitment. It is flagged when the budget is below `sales_min_project_budget` ($5,000) or documents can't be committed, and the admin can **Move to Nurture** or **Refer Out**.
+
+### Staffing & AI (migration `0008`)
+- **Team directory (Admin → Team):** Founder / Principal, Advisor, Financial specialist, Legal / regulatory professional, Virtual assistant and Content contractor, each with a cost model and rate.
+  - Founders join every engagement automatically.
+  - Engagements show staff cost and margin, and recommend a financial specialist for the Market Entry Blueprint and larger engagements.
+- **Team logins:** a registered account can be given limited admin access as `virtual_assistant` (leads, requests & intake, follow-ups, events) or `content_contractor` (market briefs, events).
+  - `_require` enforces the scope in the database from the calling `api_*` function, so it holds in both backends.
+  - The sidebar, tabs and routes follow the same scope.
+- **AI drafts (Express only):** these need `ANTHROPIC_API_KEY`.
+  - Proposal / SOW first draft, lead triage and reply draft, Monthly Market Brief research (with web search and sources), a 12-month financial-model scaffold, and checklist suggestions.
+  - Every result is labelled as a draft for human review and logged in `ai_drafts`.
+  - Requests use `claude-opus-5` with adaptive thinking, and use the server-side refusal fallback (`fallbacks: "default"`).
 
 ### Endpoints (all under `/api`)
 Every response is `{ success, data }` (lists add `meta`) or `{ success:false, message }`. Protected endpoints need `Authorization: Bearer <token>`.

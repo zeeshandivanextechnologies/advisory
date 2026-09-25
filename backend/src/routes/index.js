@@ -13,6 +13,8 @@ const admin = require('../controllers/admin.controller');
 const misc = require('../controllers/misc.controller');
 const services = require('../controllers/services.controller');
 const journey = require('../controllers/journey.controller');
+const team = require('../controllers/team.controller');
+const aiDrafts = require('../controllers/ai.controller');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: env.maxUploadBytes } });
 const router = Router();
@@ -119,6 +121,15 @@ router.post('/engagements/:id/qa', h(journey.addQaItem));
 router.put('/engagement-qa/:itemId', h(journey.setQaItem));
 router.post('/engagement-invoices/:id/pay', h(journey.payInvoiceOnline));
 
+/* ── Staffing & AI drafts ────────────────────────────────── */
+router.get('/team/me', h(team.myScope));
+router.get('/engagements/:id/team', h(team.engagementTeam));
+router.post('/ai/proposal-draft', h(aiDrafts.proposalDraft));
+router.post('/ai/lead-reply', h(aiDrafts.leadReply));
+router.post('/ai/brief-draft', h(aiDrafts.briefDraft));
+router.post('/ai/financial-model', h(aiDrafts.financialModel));
+router.post('/ai/checklist', h(aiDrafts.checklist));
+
 /* ── Admin ──────────────────────────────────────────────── */
 router.get('/admin/dashboard', h(admin.dashboard));
 router.get('/admin/users', h(admin.users));
@@ -159,5 +170,13 @@ router.get('/admin/engagement-invoices', h(journey.adminInvoices));
 router.post('/admin/engagement-invoices/:id/payment', h(journey.adminRecordPayment));
 router.get('/admin/followups', h(journey.adminFollowups));
 router.put('/admin/followups/:id', h(journey.adminUpdateFollowup));
+router.get('/admin/team/staff', h(team.staff));
+router.post('/admin/team/staff', h(team.createStaff));
+router.put('/admin/team/staff/:id', h(team.updateStaff));
+router.get('/admin/team/logins', h(team.logins));
+router.post('/admin/team/logins', h(team.grantLogin));
+router.delete('/admin/team/logins/:userId', h(team.revokeLogin));
+router.put('/admin/engagements/:id/team', h(team.saveTeamMember));
+router.delete('/admin/engagement-team/:assignmentId', h(team.removeTeamMember));
 
 module.exports = router;

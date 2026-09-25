@@ -3,7 +3,10 @@ import { FiCalendar, FiFileText } from 'react-icons/fi';
 import React, { useState, useEffect, useCallback } from 'react';
 import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, EmptyState, Modal, ConfirmModal, showToast } from '../../components/common/index';
-import { communityAPI } from '../../services/api';
+import { communityAPI, aiAPI } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { AiButton, AiReviewNote } from '../../components/journey/AiPanels';
+import { tabsFor } from '../../utils/team';
 import {
   EVENT_TYPES, eventTypeLabel, AUDIENCE_LABELS, fmtDate, fmtDateTime, toLocalInput, fromLocalInput,
 } from '../../utils/services';
@@ -268,6 +271,24 @@ function BriefsTab() {
   useEffect(() => { load(); }, [load]);
 
   const set = (k, v) => setEdit(p => ({ ...p, [k]: v }));
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiUsed, setAiUsed] = useState(false);
+
+  // AI systems: research synthesis with web sources
+  const draftWithAi = async () => {
+    if (!edit.title.trim()) return showToast('Enter a title or topic first', 'error');
+    setAiBusy(true);
+    try {
+      const r = await aiAPI.briefDraft({ topic: edit.title, audience: edit.audience, period: edit.period });
+      const x = r.data.data;
+      const sources = (x.sources || []).map(s => `- ${s.title}: ${s.url}`).join('\n');
+      setEdit(p => ({ ...p, summary: x.summary || p.summary, body: `${x.body || ''}${sources ? `\n\nSources:\n${sources}` : ''}` }));
+      setAiUsed(true);
+    } catch (err) {
+      showToast(errMsg(err, 'Could not draft with AI'), 'error');
+    } finally { setAiBusy(false); }
+  };
+
   const openEdit = (b) => setEdit(b ? {
     id: b.id, title: b.title, period: String(b.period).slice(0, 7), summary: b.summary || '', body: b.body || '',
     audience: b.audience, is_published: b.is_published,
@@ -336,6 +357,10 @@ function BriefsTab() {
           <div className="row g-3">
             <Field label="Title *" col={8}><input className="form-input" value={edit.title} onChange={e => set('title', e.target.value)} /></Field>
             <Field label="Month" col={4}><input type="month" className="form-input" value={edit.period} onChange={e => set('period', e.target.value)} /></Field>
+            <div className="col-12">
+              <AiButton onClick={draftWithAi} busy={aiBusy}>Research & draft with AI</AiButton>
+              {aiUsed && <AiReviewNote />}
+            </div>
             <Field label="Summary"><input className="form-input" value={edit.summary} onChange={e => set('summary', e.target.value)} /></Field>
             <Field label="Brief">
               <textarea className="form-input" style={{ height: 160, resize: 'vertical' }} value={edit.body} onChange={e => set('body', e.target.value)} />
@@ -364,12 +389,15 @@ function BriefsTab() {
 
 /* ═══ Page ═══════════════════════════════════════════════════ */
 export default function AdminCommunity() {
+  const { user } = useAuth();
   const [tab, setTab] = useState('memberships');
-  const TABS = [
+  // Limited team logins only see their tabs
+  const TABS = tabsFor(user, 'community', [
     { id: 'memberships', label: 'Memberships' },
     { id: 'events',      label: 'Events' },
     { id: 'briefs',      label: 'Market Briefs' },
-  ];
+  ]);
+  const current = TABS.some(t => t.id === tab) ? tab : TABS[0].id;
 
   return (
     <>
@@ -386,7 +414,7 @@ export default function AdminCommunity() {
           <div className="filter-tabs">
             <div className="nav nav-pills gap-2">
               {TABS.map(t => (
-                <button key={t.id} onClick={() => setTab(t.id)} className={`nav-link filter-nav-btn ${tab === t.id ? 'active' : ''}`} style={{ border: '1px solid var(--border-light)' }}>
+                <button key={t.id} onClick={() => setTab(t.id)} className={`nav-link filter-nav-btn ${current === t.id ? 'active' : ''}`} style={{ border: '1px solid var(--border-light)' }}>
                   {t.label}
                 </button>
               ))}
@@ -394,9 +422,9 @@ export default function AdminCommunity() {
           </div>
         </div>
 
-        {tab === 'memberships' && <MembershipsTab />}
-        {tab === 'events'      && <EventsTab />}
-        {tab === 'briefs'      && <BriefsTab />}
+        {current === 'memberships' && <MembershipsTab />}
+        {current === 'events'      && <EventsTab />}
+        {current === 'briefs'      && <BriefsTab />}
       </div>
     </>
   );

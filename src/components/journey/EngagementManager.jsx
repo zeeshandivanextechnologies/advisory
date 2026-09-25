@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, Spinner, Modal, showToast } from '../common/index';
-import { journeyAPI } from '../../services/api';
+import { journeyAPI, teamAPI } from '../../services/api';
+import { FinancialModelPanel } from './AiPanels';
+import { staffRoleLabel } from '../../utils/team';
 import EngagementStepper from './EngagementStepper';
 import { money, fmtDate, fmtDateTime } from '../../utils/services';
 import { ENGAGEMENT_LABELS, engagementBadge, invoiceBadge, PAYMENT_METHODS, workspacePath } from '../../utils/journey';
@@ -23,6 +25,9 @@ export default function EngagementManager({ engagementId, role, advisors = [], o
   const [newQa, setNewQa]       = useState('');
   const [notes, setNotes]       = useState('');
   const [payFor, setPayFor]     = useState(null);
+  const [team, setTeam]         = useState([]);
+  const [staffList, setStaffList] = useState([]);
+  const [member, setMember]     = useState({ staff_member_id: '', responsibility: '', cost: '' });
   const isAdmin = role === 'admin';
 
   const load = useCallback(() => {
@@ -32,6 +37,24 @@ export default function EngagementManager({ engagementId, role, advisors = [], o
   }, [engagementId]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Staffing: who works on this engagement and what they cost
+  const loadTeam = useCallback(() => {
+    teamAPI.getEngagementTeam(engagementId).then(r => setTeam(r.data.data || [])).catch(() => {});
+  }, [engagementId]);
+  useEffect(() => { loadTeam(); }, [loadTeam]);
+  useEffect(() => { if (isAdmin) teamAPI.getStaff().then(r => setStaffList((r.data.data || []).filter(s => s.is_active))).catch(() => {}); }, [isAdmin]);
+
+  const addMember = async () => {
+    if (!member.staff_member_id) return showToast('Choose a team member', 'error');
+    if (await act(() => teamAPI.saveTeamMember(engagementId, member), 'Team member added')) {
+      setMember({ staff_member_id: '', responsibility: '', cost: '' });
+      loadTeam();
+    }
+  };
+  const removeMember = async (t) => {
+    if (await act(() => teamAPI.removeTeamMember(t.id), 'Removed from team')) loadTeam();
+  };
 
   const act = async (fn, msg) => {
     setBusy(true);
@@ -81,6 +104,48 @@ export default function EngagementManager({ engagementId, role, advisors = [], o
         <button className="ai-thm-btn outline" style={{ marginTop: 12 }} onClick={() => navigate(workspacePath(role, d.case_id))}>
           <FiExternalLink /> Open workspace ({d.case_number})
         </button>
+      )}
+
+      {/* Staffing */}
+      <H>Team & margin</H>
+      <p style={{ fontSize: 12, color: '#4A4949', marginBottom: 6 }}>
+        Staff cost {money(d.staff_cost, d.currency)} · margin <b style={{ color: Number(d.margin) < 0 ? 'var(--red)' : '#000' }}>{money(d.margin, d.currency)}</b>
+      </p>
+      {d.needs_financial_specialist && (
+        <p style={{ fontSize: 12, color: '#92400E', background: '#F59E0B1F', borderRadius: 6, padding: '6px 10px' }}>
+          <FiAlertTriangle style={{ verticalAlign: '-2px' }} /> Market Entry Blueprint / larger engagement — add a financial specialist for the model review ($500–$1,500).
+        </p>
+      )}
+      {team.map(t => (
+        <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid var(--border-light)' }}>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#000' }}>{t.full_name} · {staffRoleLabel(t.staff_role)}</div>
+            <div style={{ fontSize: 12, color: '#4A4949' }}>{t.responsibility || '—'}{Number(t.cost) > 0 ? ` · ${money(t.cost, t.currency)}` : ''}</div>
+          </div>
+          {isAdmin && t.staff_role !== 'founder' && <button className="ai-remove-btn" disabled={busy} onClick={() => removeMember(t)}>Remove</button>}
+        </div>
+      ))}
+      {!team.length && <p style={{ fontSize: 12, color: 'var(--text-dark-4)' }}>No team assigned yet. Founders join automatically once they are in the team directory.</p>}
+      {isAdmin && (
+        <div className="row g-2" style={{ marginTop: 6 }}>
+          <div className="col-md-4">
+            <select className="form-select" value={member.staff_member_id} onChange={e => setMember(m => ({ ...m, staff_member_id: e.target.value }))}>
+              <option value="">Add team member…</option>
+              {staffList.map(s => <option key={s.id} value={s.id}>{s.full_name} ({staffRoleLabel(s.staff_role)})</option>)}
+            </select>
+          </div>
+          <div className="col-md-4"><input className="form-input" placeholder="Responsibility" value={member.responsibility} onChange={e => setMember(m => ({ ...m, responsibility: e.target.value }))} /></div>
+          <div className="col-md-2"><input type="number" className="form-input" placeholder="Cost" value={member.cost} onChange={e => setMember(m => ({ ...m, cost: e.target.value }))} /></div>
+          <div className="col-md-2"><button className="ai-thm-btn outline w-100" disabled={busy} onClick={addMember}>Add</button></div>
+        </div>
+      )}
+
+      {/* AI systems: financial-model scaffolding */}
+      {d.status !== 'cancelled' && (
+        <>
+          <H>Financial model</H>
+          <FinancialModelPanel engagementId={d.id} />
+        </>
       )}
 
       {/* Next action */}

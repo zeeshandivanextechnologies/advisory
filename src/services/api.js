@@ -27,3 +27,5 @@ export const serviceAPI       = impl.serviceAPI;
 export const communityAPI     = impl.communityAPI;
 export const journeyAPI       = impl.journeyAPI;
 export const salesAPI         = impl.salesAPI;
+export const teamAPI          = impl.teamAPI;
+export const aiAPI            = impl.aiAPI;

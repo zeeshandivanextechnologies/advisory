@@ -2,7 +2,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, EmptyState, Modal, showToast } from '../../components/common/index';
-import { journeyAPI, serviceAPI, adminAPI } from '../../services/api';
+import { journeyAPI, serviceAPI, adminAPI, aiAPI } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { AiButton, AiReviewNote } from '../../components/journey/AiPanels';
+import { tabsFor } from '../../utils/team';
 import EngagementManager from '../../components/journey/EngagementManager';
 import { money, fmtDate, linesToList, listToLines } from '../../utils/services';
 import {
@@ -40,6 +43,23 @@ function ProposalsTab({ openEditId, onSent }) {
   const [create, setCreate]     = useState(null);
   const [offerings, setOfferings] = useState([]);
   const [saving, setSaving]     = useState(false);
+  const [aiBusy, setAiBusy]     = useState(false);
+  const [aiUsed, setAiUsed]     = useState(false);
+
+  // AI systems: first draft of the SOW from the request, intake and service definition
+  const draftWithAi = async () => {
+    setAiBusy(true);
+    try {
+      const r = await aiAPI.proposalDraft(edit.id);
+      const x = r.data.data;
+      setEdit(p => ({ ...p, title: x.title || p.title, scope: x.scope || p.scope, timeline: x.timeline || p.timeline,
+        payment_terms: x.payment_terms || p.payment_terms,
+        deliverables: listToLines(x.deliverables) || p.deliverables, out_of_scope: listToLines(x.out_of_scope) || p.out_of_scope }));
+      setAiUsed(true);
+    } catch (err) {
+      showToast(errMsg(err, 'Could not draft with AI'), 'error');
+    } finally { setAiBusy(false); }
+  };
 
   const load = useCallback(() => {
     setLoading(true);
@@ -173,6 +193,10 @@ function ProposalsTab({ openEditId, onSent }) {
         )}>
         {edit && (
           <div className="row g-3">
+            <div className="col-12">
+              <AiButton onClick={draftWithAi} busy={aiBusy}>Draft scope with AI</AiButton>
+              {aiUsed && <AiReviewNote />}
+            </div>
             <Field label="Title"><input className="form-input" value={edit.title} onChange={e => setEdit(p => ({ ...p, title: e.target.value }))} /></Field>
             <Field label="Scope *">
               <textarea className="form-input" style={{ height: 90, resize: 'vertical' }} value={edit.scope} onChange={e => setEdit(p => ({ ...p, scope: e.target.value }))} />
@@ -442,12 +466,15 @@ export default function AdminEngagements() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const [reloadKey, setReloadKey] = useState(0);
-  const TABS = [
+  const { user } = useAuth();
+  // Limited team logins (e.g. virtual assistant) only see their tabs
+  const TABS = tabsFor(user, 'engagements', [
     { id: 'proposals',   label: 'Proposals' },
     { id: 'engagements', label: 'Engagements' },
     { id: 'invoices',    label: 'Invoices' },
     { id: 'followups',   label: 'Follow-ups' },
-  ];
+  ]);
+  const current = TABS.some(t => t.id === tab) ? tab : TABS[0].id;
 
   return (
     <>
@@ -464,7 +491,7 @@ export default function AdminEngagements() {
           <div className="filter-tabs">
             <div className="nav nav-pills gap-2">
               {TABS.map(t => (
-                <button key={t.id} onClick={() => setTab(t.id)} className={`nav-link filter-nav-btn ${tab === t.id ? 'active' : ''}`} style={{ border: '1px solid var(--border-light)' }}>
+                <button key={t.id} onClick={() => setTab(t.id)} className={`nav-link filter-nav-btn ${current === t.id ? 'active' : ''}`} style={{ border: '1px solid var(--border-light)' }}>
                   {t.label}
                 </button>
               ))}
@@ -472,10 +499,10 @@ export default function AdminEngagements() {
           </div>
         </div>
 
-        {tab === 'proposals'   && <ProposalsTab openEditId={handoff.proposalId} onSent={() => setReloadKey(k => k + 1)} />}
-        {tab === 'engagements' && <EngagementsTab reloadKey={reloadKey} />}
-        {tab === 'invoices'    && <InvoicesTab />}
-        {tab === 'followups'   && <FollowupsTab />}
+        {current === 'proposals'   && <ProposalsTab openEditId={handoff.proposalId} onSent={() => setReloadKey(k => k + 1)} />}
+        {current === 'engagements' && <EngagementsTab reloadKey={reloadKey} />}
+        {current === 'invoices'    && <InvoicesTab />}
+        {current === 'followups'   && <FollowupsTab />}
       </div>
     </>
   );

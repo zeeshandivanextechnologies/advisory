@@ -6,6 +6,7 @@ import { Badge, Spinner, EmptyState, SearchInput, Pagination, Modal, showToast }
 import { serviceAPI, adminAPI, intakeAPI, journeyAPI, salesAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { LogHoursModal, RetainerLogModal } from '../../components/services/RetainerModals';
+import { tabsFor, isFullAdmin } from '../../utils/team';
 import {
   priceLabel, money, hours, fmtDate, CATEGORY_LABELS, PRICING_MODELS, REQUEST_STATUSES, OPEN_REQUEST,
   linesToList, listToLines, PROSPECT_TYPES,
@@ -28,6 +29,8 @@ const Footer = ({ onCancel, onSave, saving, label = 'Save' }) => (
 /* ═══ Requests ═══════════════════════════════════════════════ */
 function RequestsTab({ onRetainerCreated }) {
   const navigate              = useNavigate();
+  const { user }              = useAuth();
+  const full                  = isFullAdmin(user);
   const [intake, setIntake]   = useState(null);
   const [sales, setSales]     = useState(null);
   const [actionNote, setActionNote] = useState('');
@@ -208,7 +211,7 @@ function RequestsTab({ onRetainerCreated }) {
                 </div>
               ) : <p style={{ fontSize: 12, color: 'var(--orange)', marginBottom: 0 }}>Intake not completed yet.</p>}
             </div>
-            {sales && (
+            {sales && full && (
               <div className="col-12">
                 <label className="form-label">Prospect profile (meeting rules)</label>
                 <p style={{ fontSize: 12, color: '#4A4949', marginBottom: 6 }}>
@@ -230,7 +233,7 @@ function RequestsTab({ onRetainerCreated }) {
                 </div>
               </div>
             )}
-            {OPEN_REQUEST.includes(edit.status) && (
+            {full && OPEN_REQUEST.includes(edit.status) && (
               <div className="col-12">
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                   <button className="thm-btn" disabled={saving} onClick={createProposal}>Create Proposal / SOW</button>
@@ -241,7 +244,7 @@ function RequestsTab({ onRetainerCreated }) {
                   value={actionNote} onChange={e => setActionNote(e.target.value)} />
               </div>
             )}
-            {edit.offering_slug === 'executive-advisory-retainer' && OPEN_REQUEST.includes(edit.status) && (
+            {full && edit.offering_slug === 'executive-advisory-retainer' && OPEN_REQUEST.includes(edit.status) && (
               <div className="col-12">
                 <button className="ai-thm-btn outline" disabled={saving} onClick={startRetainer}>Start Retainer for this Client</button>
               </div>
@@ -542,13 +545,15 @@ function RetainersTab({ reloadKey }) {
 
 /* ═══ Page ═══════════════════════════════════════════════════ */
 export default function AdminServices() {
+  const { user }                  = useAuth();
   const [tab, setTab]             = useState('requests');
   const [retainerKey, setRetainerKey] = useState(0);
-  const TABS = [
+  // Limited team logins only see their tabs
+  const TABS = tabsFor(user, 'services', [
     { id: 'requests',  label: 'Requests' },
     { id: 'offerings', label: 'Offerings & Pricing' },
     { id: 'retainers', label: 'Retainers' },
-  ];
+  ]);
 
   return (
     <>

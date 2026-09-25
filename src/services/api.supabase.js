@@ -325,6 +325,26 @@ export const journeyAPI = {
   adminUpdateFollowup:   (id, data)       => rpc('api_admin_update_followup', { p_id: Number(id), p: data }).then(ok),
 };
 
+/* ── Staffing: team directory, team logins, engagement team ── */
+export const teamAPI = {
+  getMyScope:       ()             => rpc('api_my_team_scope').then(ok),
+  getStaff:         ()             => rpc('api_admin_staff').then(ok),
+  saveStaff:        (id, data)     => rpc('api_admin_save_staff', { p_id: id ? Number(id) : null, p: data }).then(ok),
+  getLogins:        ()             => rpc('api_admin_team_logins').then(ok),
+  grantLogin:       (email, scope) => rpc('api_admin_grant_team_login', { p_email: email, p_scope: scope }).then(ok),
+  revokeLogin:      (userId)       => rpc('api_admin_revoke_team_login', { p_user_id: userId }).then(ok),
+  getEngagementTeam:(id)           => rpc('api_engagement_team', { p_engagement_id: Number(id) }).then(ok),
+  saveTeamMember:   (engId, data)  => rpc('api_admin_save_team_member', { p_engagement_id: Number(engId), p: data }).then(ok),
+  removeTeamMember: (assignmentId) => rpc('api_admin_remove_team_member', { p_id: Number(assignmentId) }).then(ok),
+};
+
+/* ── AI drafts need the Express server (it holds the API key) ── */
+const aiUnavailable = () => Promise.reject(toError('AI drafting needs the backend server (set REACT_APP_BACKEND=express).'));
+export const aiAPI = {
+  proposalDraft: aiUnavailable, leadReply: aiUnavailable, briefDraft: aiUnavailable,
+  financialModel: aiUnavailable, checklist: aiUnavailable,
+};
+
 /* ── Public (no login needed) ──────────────────────────────── */
 export const publicAPI = {
   getSettings: ()     => rpc('api_public_settings').then(ok),

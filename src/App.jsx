@@ -61,6 +61,7 @@ import AdminServices  from './pages/admin/Services';
 import AdminCommunity from './pages/admin/Community';
 import AdminEngagements from './pages/admin/Engagements';
 import AdminLeads     from './pages/admin/Leads';
+import AdminTeam      from './pages/admin/Team';
 import Home from './pages/Landing/Home';
 import LandingLayout from './pages/Landing/LandingLayout';
 import Boarding from './pages/onboarding/Boarding';
@@ -175,6 +176,7 @@ function AppRoutes() {
         <Route path="community"     element={<ErrorBoundary><AdminCommunity /></ErrorBoundary>} />
         <Route path="engagements"   element={<ErrorBoundary><AdminEngagements /></ErrorBoundary>} />
         <Route path="leads"         element={<ErrorBoundary><AdminLeads /></ErrorBoundary>} />
+        <Route path="team"          element={<ErrorBoundary><AdminTeam /></ErrorBoundary>} />
         <Route path="cases/:id"     element={<ErrorBoundary><CaseWorkspacePage /></ErrorBoundary>} />
       </Route>
 

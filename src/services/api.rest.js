@@ -230,6 +230,29 @@ export const journeyAPI = {
   adminUpdateFollowup:   (id, data)       => api.put(`/admin/followups/${id}`, data),
 };
 
+/* ── Staffing: team directory, team logins, engagement team ── */
+export const teamAPI = {
+  getMyScope:       ()             => api.get('/team/me'),
+  getStaff:         ()             => api.get('/admin/team/staff'),
+  saveStaff:        (id, data)     => id ? api.put(`/admin/team/staff/${id}`, data) : api.post('/admin/team/staff', data),
+  getLogins:        ()             => api.get('/admin/team/logins'),
+  grantLogin:       (email, scope) => api.post('/admin/team/logins', { email, scope }),
+  revokeLogin:      (userId)       => api.delete(`/admin/team/logins/${userId}`),
+  getEngagementTeam:(id)           => api.get(`/engagements/${id}/team`),
+  saveTeamMember:   (engId, data)  => api.put(`/admin/engagements/${engId}/team`, data),
+  removeTeamMember: (assignmentId) => api.delete(`/admin/engagement-team/${assignmentId}`),
+};
+
+/* ── AI drafts (always reviewed by a person before use) ─────── */
+const aiTimeout = { timeout: 180000 };
+export const aiAPI = {
+  proposalDraft:  (proposalId)   => api.post('/ai/proposal-draft', { proposal_id: proposalId }, aiTimeout),
+  leadReply:      (leadId)       => api.post('/ai/lead-reply', { lead_id: leadId }, aiTimeout),
+  briefDraft:     (data)         => api.post('/ai/brief-draft', data, aiTimeout),
+  financialModel: (engagementId) => api.post('/ai/financial-model', { engagement_id: engagementId }, aiTimeout),
+  checklist:      (caseId)       => api.post('/ai/checklist', { case_id: caseId }, aiTimeout),
+};
+
 /* ── Public (no login needed) ──────────────────────────────── */
 export const publicAPI = {
   getSettings: ()     => api.get('/settings'),
