@@ -200,7 +200,8 @@ export const ToastContainer = () => {
   return (
     <div className="toast-wrap">
       {toasts.map(t => (
-        <div key={t.id} className={`toast toast-${t.type}`}>{t.message}</div>
+        // `show` is required: Bootstrap's CSS hides any `.toast` without it
+        <div key={t.id} className={`toast toast-${t.type} show`} role="alert">{t.message}</div>
       ))}
     </div>
   );
