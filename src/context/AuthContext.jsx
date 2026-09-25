@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../services/api';
-import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext(null);
 
@@ -8,22 +7,15 @@ export const AuthProvider = ({ children }) => {
   const [user,    setUser]    = useState(null);
   const [loading, setLoading] = useState(true);
 
-  /* ── Bootstrap: restore the Supabase session and load the profile ── */
+  /* ── Bootstrap: restore the saved session and load the profile ── */
   useEffect(() => {
-    supabase.auth.getSession()
-      .then(({ data: { session } }) => (session ? authAPI.getMe() : null))
-      .then(res => setUser(res?.data.user || null))
-      .catch(async () => {
-        await supabase.auth.signOut();
-        setUser(null);
-      })
+    authAPI.restoreSession()
+      .then(u => setUser(u || null))
+      .catch(() => setUser(null))
       .finally(() => setLoading(false));
 
-    // Keep in sync with sign-outs from other tabs or expired refresh tokens
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') setUser(null);
-    });
-    return () => subscription.unsubscribe();
+    // Keep in sync with sign-outs from other tabs or expired sessions
+    return authAPI.onSignedOut(() => setUser(null));
   }, []);
 
   /* ── Login ───────────────────────────────────────────────── */
@@ -48,7 +40,7 @@ export const AuthProvider = ({ children }) => {
 
   /* ── Logout ──────────────────────────────────────────────── */
   const logout = useCallback(() => {
-    supabase.auth.signOut();
+    authAPI.logout();
     setUser(null);
   }, []);
 
