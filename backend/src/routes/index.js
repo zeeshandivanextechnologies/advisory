@@ -19,6 +19,7 @@ const router = Router();
 router.get('/health', (req, res) => res.json({ success: true, status: 'ok' }));
 router.get('/settings', h(misc.publicSettings));
 router.post('/contact', h(misc.contact));
+router.post('/payments/stripe/webhook', h(misc.stripeWebhook)); // raw body, see app.js
 router.get('/subscriptions/plans', h(misc.plans));
 
 /* ── Auth ───────────────────────────────────────────────── */
@@ -38,6 +39,8 @@ router.use(requireAuth);
 router.get('/users/dashboard', h(users.dashboard));
 router.get('/users/profile', h(users.getProfile));
 router.put('/users/profile', h(users.updateProfile));
+router.get('/users/notification-prefs', h(misc.getNotificationPrefs));
+router.put('/users/notification-prefs', h(misc.updateNotificationPrefs));
 router.get('/users/consultations', h(users.listConsultations));
 router.post('/users/consultations', h(users.bookConsultation));
 router.put('/users/consultations/:id', h(users.updateConsultation));
@@ -86,6 +89,7 @@ router.post('/subscriptions/admin/plans', h(misc.adminCreatePlan));
 router.put('/subscriptions/admin/plans/:id', h(misc.adminUpdatePlan));
 router.delete('/subscriptions/admin/plans/:id', h(misc.adminDeletePlan));
 router.get('/payments', h(misc.payments));
+router.get('/payments/stripe/confirm', h(misc.confirmCheckout));
 
 /* ── Admin ──────────────────────────────────────────────── */
 router.get('/admin/dashboard', h(admin.dashboard));

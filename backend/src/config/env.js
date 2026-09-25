@@ -20,6 +20,13 @@ module.exports = {
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   maxUploadBytes: Number(process.env.MAX_UPLOAD_MB || 20) * 1024 * 1024,
 
+  // Online payments (used when Admin → Settings → Payment gateway = Stripe)
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+
+  // Session reminder emails, checked every minute
+  remindersEnabled: process.env.SESSION_REMINDERS !== 'false',
+
   appName: process.env.APP_NAME || 'AunAdvisory',
   // Receives contact-form inquiries; empty = don't forward
   adminEmail: process.env.ADMIN_EMAIL || '',

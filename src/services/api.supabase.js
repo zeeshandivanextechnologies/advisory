@@ -136,6 +136,8 @@ export const userAPI = {
   bookConsultation:    (data)     => rpc('api_book_consultation', { p: data }).then(ok),
   updateConsultation:  (id, data) => rpc('api_update_consultation', { p_id: Number(id), p: data }).then(ok),
   getConsultationJoin: (id)       => rpc('api_consultation_join', { p_id: Number(id) }).then(ok),
+  getNotificationPrefs:    ()     => rpc('api_notification_prefs').then(ok),
+  updateNotificationPrefs: (data) => rpc('api_update_notification_prefs', { p: data }).then(ok),
 };
 
 /* ── Advisors ──────────────────────────────────────────────── */
@@ -230,7 +232,7 @@ export const notifAPI = {
 
 /* ── Admin ─────────────────────────────────────────────────── */
 export const adminAPI = {
-  getDashboard:        ()         => rpc('api_admin_dashboard').then(ok),
+  getDashboard:        (p = {})   => rpc('api_admin_dashboard', { p_period: p.period || null }).then(ok),
   getUsers:            (p = {})   => rpc('api_admin_users', { p }).then(okList),
   toggleUserStatus:    (id)       => rpc('api_admin_toggle_user', { p_id: id }).then(ok),
   getAdvisors:         (p = {})   => rpc('api_admin_advisors', { p }).then(okList),
@@ -251,6 +253,8 @@ export const subscriptionAPI = {
   adminCreatePlan: (data)  => rpc('api_admin_save_plan', { p_id: null, p: data }).then(ok),
   adminUpdatePlan: (id, d) => rpc('api_admin_save_plan', { p_id: Number(id), p: d }).then(ok),
   adminDeletePlan: (id)    => rpc('api_admin_delete_plan', { p_id: Number(id) }).then(ok),
+  // Online checkout needs the Express server; nothing to confirm in serverless mode
+  confirmCheckout: ()      => Promise.resolve(ok(null)),
 };
 
 export const paymentAPI = {

@@ -1,7 +1,10 @@
 const { rpc } = require('../config/db');
 const { send, sendList } = require('../utils/http');
 
-exports.dashboard = async (req, res) => send(res, await rpc('api_admin_dashboard', {}, req.userId));
+exports.dashboard = async (req, res) => {
+  const period = ['7d', '30d', 'all'].includes(req.query.period) ? req.query.period : null;
+  send(res, await rpc('api_admin_dashboard', { p_period: period }, req.userId));
+};
 
 exports.users = async (req, res) => sendList(res, await rpc('api_admin_users', { p: req.query }, req.userId));
 

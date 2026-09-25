@@ -27,6 +27,31 @@ export default function AdminRevenue() {
 
   const { stats, summary = [], recent_payments = [] } = data || {};
 
+  // Payments table + monthly summary as one CSV file
+  const handleExport = () => {
+    const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const rows = [
+      ['Invoice', 'Customer', 'Amount', 'Currency', 'Method', 'Status', 'Paid At'],
+      ...recent_payments.map(p => [
+        p.invoice_no, p.user_name, p.amount, p.currency || currency,
+        (p.payment_method || '').replace(/_/g, ' '), p.status,
+        p.paid_at ? new Date(p.paid_at).toLocaleString('en-GB') : '',
+      ]),
+      [],
+      ['Period', 'Revenue', 'Transactions'],
+      ...summary.map(s => [s.period, s.total, s.transactions]),
+    ];
+    const csv  = rows.map(r => r.map(q).join(',')).join('\n');
+    const url  = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `revenue-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
   const totalRevenue = Number(stats?.total_revenue || 0);
   const pendingAmount = Number(stats?.pending_amount || 0);
 
@@ -51,7 +76,7 @@ export default function AdminRevenue() {
             <h1 style={{ fontSize: 24, color: '#000000', fontFamily: 'var(--font-h)', fontWeight: 600, letterSpacing: '0.02em', marginBottom : 0 }}>Revenue & Payments</h1>
             <p style={{ fontSize: 14, color: '#4A4949',  fontWeight: 400, letterSpacing: '0.02em', marginBottom : 0 }}>Financial overview of the platform</p>
           </div>
-          <button className="ai-thm-btn"><FaArrowDown /> <span className='mobile-ai-secure-title'>Export CSV</span> </button>
+          <button className="ai-thm-btn" onClick={handleExport}><FaArrowDown /> <span className='mobile-ai-secure-title'>Export CSV</span> </button>
         </div>
 
 

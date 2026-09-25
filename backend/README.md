@@ -29,7 +29,7 @@ backend/
 │   │   ├── auth.js           JWT sign/verify (requireAuth)
 │   │   └── errorHandler.js   maps errors → { success:false, message } + status
 │   ├── controllers/          one file per area (auth, users, advisors, cases, documents, admin, misc)
-│   ├── services/             mailer (nodemailer), email templates, signup codes / reset tokens
+│   ├── services/             mailer, email templates, auth codes, payments (Stripe), reminders, prefs
 │   ├── routes/index.js       every endpoint
 │   └── utils/
 └── supabase/
@@ -37,7 +37,8 @@ backend/
     ├── migrations/           schema + api_* functions, applied in order
     │   ├── 0001_init.sql
     │   ├── 0002_client_journey.sql
-    │   └── 0003_auth_codes.sql
+    │   ├── 0003_auth_codes.sql
+    │   └── 0004_pending_features.sql
     ├── templates/            auth emails (6-digit signup code, password reset)
     └── seed.sql
 ```
@@ -70,6 +71,8 @@ REACT_APP_API_URL=http://localhost:5000/api
 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | Supabase Auth (signup, OTP, login) |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Server only.** Used for account creation, file storage and password changes. Never put it in the frontend |
 | `SMTP_*`, `MAIL_FROM`, `APP_NAME`, `ADMIN_EMAIL` | Outgoing email (see below) |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Online plan payments when the gateway is Stripe (see below) |
+| `SESSION_REMINDERS` | `false` turns off the 30-minute session reminder job |
 
 ### Email (nodemailer)
 In Express mode the API sends every email itself over SMTP.
@@ -94,6 +97,34 @@ In Express mode the API sends every email itself over SMTP.
   SMTP_PASS=<app password>
   MAIL_FROM="AunAdvisory <you@gmail.com>"
   ```
+
+### Notification preferences
+Users manage these under Settings → Notifications (`GET|PUT /users/notification-prefs`). A missing key means the notification is on. Account emails (codes, resets, security alerts) and booking confirmations are always sent.
+
+| Key | Controls |
+|---|---|
+| `session_reminders` | Reminder email 30 minutes before a session. The in-app reminder is always created |
+| `document_updates` | Email when a document is approved or rejected |
+| `billing_notifs` | Payment receipts |
+| `consultant_messages` | Case status updates, and session notes / action items |
+| `compliance_reminders` | Saved for later; there are no compliance deadlines yet |
+
+### Payments
+Admin → Settings → Payment gateway decides how plans are paid.
+
+- **manual** (default): the plan activates immediately.
+- **stripe**:
+  1. `POST /subscriptions/purchase` creates a *pending* payment and returns `redirect_url` to Stripe Checkout.
+  2. After the customer pays, Stripe calls `POST /payments/stripe/webhook`, and the return page calls `GET /payments/stripe/confirm`. Either one activates the plan; activation is idempotent.
+  3. Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. To test locally, run `stripe listen --forward-to localhost:5000/api/payments/stripe/webhook`.
+- **tap**: not supported yet. Purchases return a clear error.
+
+Online payments need the Express backend. In Supabase-only mode, only `manual` works.
+
+### Maintenance mode
+When Admin → Settings → Maintenance Mode is on:
+- Every non-admin API call returns `503`, including login.
+- Admins and public endpoints (settings, plans, contact) keep working.
 
 ### Endpoints (all under `/api`)
 Every response is `{ success, data }` (lists add `meta`) or `{ success:false, message }`. Protected endpoints need `Authorization: Bearer <token>`.

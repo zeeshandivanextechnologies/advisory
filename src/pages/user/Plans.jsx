@@ -30,6 +30,31 @@ export default function Plans() {
 
   useEffect(() => { loadData(); }, []);
 
+  // Back from online checkout: /user/plans?checkout=success&session_id=... or ?checkout=cancelled
+  useEffect(() => {
+    const params    = new URLSearchParams(window.location.search);
+    const checkout  = params.get('checkout');
+    const sessionId = params.get('session_id');
+    if (!checkout) return;
+    window.history.replaceState(null, '', window.location.pathname);
+
+    if (checkout === 'cancelled') { showToast('Payment was cancelled', 'error'); return; }
+    if (!sessionId) return;
+    subscriptionAPI.confirmCheckout(sessionId)
+      .then(async (r) => {
+        if (r.data.data?.status === 'paid') {
+          showToast('Payment successful! Your plan is now active.');
+          const me = await authAPI.getMe();
+          if (me.data.user) updateUser(me.data.user);
+          loadData();
+        } else {
+          showToast('Your payment is still processing. We will email you once it completes.');
+        }
+      })
+      .catch(err => showToast(err.response?.data?.message || 'Could not confirm the payment', 'error'));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handlePurchase = async (plan) => {
     if (plan.price === 0) return showToast('You are already on the free plan');
     setBuying(plan.id);

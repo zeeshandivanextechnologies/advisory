@@ -84,6 +84,8 @@ export const userAPI = {
   bookConsultation:    (data)     => api.post('/users/consultations', data),
   updateConsultation:  (id, data) => api.put(`/users/consultations/${id}`, data),
   getConsultationJoin: (id)       => api.get(`/users/consultations/${id}/join`),
+  getNotificationPrefs:    ()     => api.get('/users/notification-prefs'),
+  updateNotificationPrefs: (data) => api.put('/users/notification-prefs', data),
 };
 
 /* ── Advisors ──────────────────────────────────────────────── */
@@ -138,7 +140,7 @@ export const notifAPI = {
 
 /* ── Admin ─────────────────────────────────────────────────── */
 export const adminAPI = {
-  getDashboard:        ()         => api.get('/admin/dashboard'),
+  getDashboard:        (p)        => api.get('/admin/dashboard', { params: p }),
   getUsers:            (p)        => api.get('/admin/users', { params: p }),
   toggleUserStatus:    (id)       => api.put(`/admin/users/${id}/toggle`),
   getAdvisors:         (p)        => api.get('/admin/advisors', { params: p }),
@@ -159,6 +161,8 @@ export const subscriptionAPI = {
   adminCreatePlan: (data)  => api.post('/subscriptions/admin/plans', data),
   adminUpdatePlan: (id, d) => api.put(`/subscriptions/admin/plans/${id}`, d),
   adminDeletePlan: (id)    => api.delete(`/subscriptions/admin/plans/${id}`),
+  // After returning from Stripe Checkout (?session_id=...)
+  confirmCheckout: (sessionId) => api.get('/payments/stripe/confirm', { params: { session_id: sessionId } }),
 };
 
 export const paymentAPI = {

@@ -115,3 +115,35 @@ exports.contactAdmin = ({ name, email, company, subject, message }) => ({
   ].join('')),
   text: `New inquiry from ${name} <${email}>${company ? ` (${company})` : ''}\n${subject || ''}\n\n${message}`,
 });
+
+exports.sessionReminder = ({ name, withName, when, duration, medium, link }) => ({
+  subject: `Reminder: your session starts at ${fmtDate(when)}`,
+  html: layout('Your session starts soon', [
+    p(`Hi ${esc(name)},`),
+    p(`Your ${duration}-minute ${esc(medium.replace('_', ' '))} session with <b>${esc(withName)}</b> starts at <b>${esc(fmtDate(when))}</b>.`),
+    button(`${env.frontendUrl}${link}`, 'Open my sessions'),
+  ].join('')),
+  text: `Reminder: your ${duration}-minute session with ${withName} starts at ${fmtDate(when)}.`,
+});
+
+exports.documentReviewed = ({ name, fileName, status, notes }) => ({
+  subject: `Your document was ${status}: ${fileName}`,
+  html: layout(`Document ${status}`, [
+    p(`Hi ${esc(name)},`),
+    p(`Your document <b>${esc(fileName)}</b> was <b>${esc(status)}</b>.`),
+    notes ? p(`<i>Reviewer notes:</i> ${esc(notes)}`) : '',
+    button(`${env.frontendUrl}/user/documents`, 'View documents'),
+  ].join('')),
+  text: `Your document "${fileName}" was ${status}.${notes ? ` Notes: ${notes}` : ''}`,
+});
+
+exports.caseUpdate = ({ name, title, summary, nextSteps }) => ({
+  subject: `${title}`,
+  html: layout(title, [
+    p(`Hi ${esc(name)},`),
+    p(esc(summary).replace(/\n/g, '<br>')),
+    nextSteps ? p(`<b>Next steps:</b> ${esc(nextSteps).replace(/\n/g, '<br>')}`) : '',
+    button(`${env.frontendUrl}/user/dashboard`, 'Open my dashboard'),
+  ].join('')),
+  text: `${title}\n\n${summary}${nextSteps ? `\n\nNext steps: ${nextSteps}` : ''}`,
+});

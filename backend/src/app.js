@@ -10,6 +10,8 @@ app.disable('x-powered-by');
 app.use(cors({
   origin: (origin, cb) => cb(null, !origin || env.corsOrigins.includes(origin.replace(/\/$/, ''))),
 }));
+// Stripe signs the exact raw bytes, so this route must skip JSON parsing
+app.use('/api/payments/stripe/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '1mb' }));
 
 app.use('/api', routes);

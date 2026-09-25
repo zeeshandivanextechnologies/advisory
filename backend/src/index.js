@@ -2,6 +2,7 @@ const env = require('./config/env');
 const app = require('./app');
 const { pool } = require('./config/db');
 const mailer = require('./services/mailer');
+const reminders = require('./services/reminders');
 
 const server = app.listen(env.port, async () => {
   console.log(`AunAdvisory API listening on http://localhost:${env.port}/api`);
@@ -17,6 +18,10 @@ const server = app.listen(env.port, async () => {
       .catch((err) => console.error(`SMTP connection failed (${env.smtp.host}):`, err.message));
   } else {
     console.warn('SMTP not configured: emails (OTP codes, reset links) will be printed here in the console');
+  }
+  if (env.remindersEnabled) {
+    reminders.start();
+    console.log('Session reminders: on (checked every minute)');
   }
   if (!env.supabaseServiceRoleKey) {
     console.warn('SUPABASE_SERVICE_ROLE_KEY not set: document upload/download and password changes will fail');

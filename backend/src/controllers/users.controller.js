@@ -1,6 +1,7 @@
 const { rpc, pool } = require('../config/db');
 const { send } = require('../utils/http');
 const { sendMailSafe } = require('../services/mailer');
+const { wantsEmail, contactFor } = require('../services/prefs');
 const tpl = require('../services/emailTemplates');
 
 exports.dashboard = async (req, res) => send(res, await rpc('api_user_dashboard', {}, req.userId));
@@ -35,8 +36,26 @@ const emailBooking = async (c) => {
   sendMailSafe({ to: r.advisor_email, ...tpl.bookingAdvisor({ ...common, name: r.advisor_name, clientName: r.client_name, notes: c.user_notes }) });
 };
 
-exports.updateConsultation = async (req, res) =>
-  send(res, await rpc('api_update_consultation', { p_id: req.params.id, p: req.body }, req.userId));
+exports.updateConsultation = async (req, res) => {
+  const c = await rpc('api_update_consultation', { p_id: req.params.id, p: req.body }, req.userId);
+  send(res, c);
+
+  const handover = Array.isArray(req.body.action_items) || req.body.recording_url;
+  if (handover && c.user_id !== req.userId) emailHandover(c);
+};
+
+// "Consultant messages" preference covers session notes / action items
+const emailHandover = (c) =>
+  (async () => {
+    if (!(await wantsEmail(c.user_id, 'consultant_messages'))) return;
+    const who = await contactFor(c.user_id);
+    if (!who) return;
+    const items = (c.action_items || [])
+      .map((i) => `- ${typeof i === 'string' ? i : i.text}${i && i.owner ? ` (${i.owner})` : ''}`).join('\n');
+    const summary = [c.next_step && `Next step: ${c.next_step}`, items, c.recording_url && `Recording: ${c.recording_url}`]
+      .filter(Boolean).join('\n\n') || 'Your advisor shared notes from your session.';
+    sendMailSafe({ to: who.email, ...tpl.caseUpdate({ name: who.full_name, title: 'Session notes and action items', summary }) });
+  })().catch((err) => console.error('[mail] handover email failed:', err.message));
 
 exports.joinConsultation = async (req, res) =>
   send(res, await rpc('api_consultation_join', { p_id: req.params.id }, req.userId));

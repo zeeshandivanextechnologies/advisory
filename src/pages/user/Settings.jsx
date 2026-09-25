@@ -353,7 +353,24 @@ function NotificationTab() {
   const [prefs, setPrefs] = useState(
     Object.fromEntries(NOTIF_PREFS.map(p => [p.key, true]))
   );
-  const toggle = (k) => setPrefs(prev => ({ ...prev, [k]: !prev[k] }));
+
+  useEffect(() => {
+    userAPI.getNotificationPrefs()
+      .then(r => setPrefs(prev => ({ ...prev, ...(r.data.data || {}) })))
+      .catch(() => {});
+  }, []);
+
+  // Save each change right away; roll back the switch if saving fails
+  const toggle = (k) => {
+    const next = !prefs[k];
+    setPrefs(prev => ({ ...prev, [k]: next }));
+    userAPI.updateNotificationPrefs({ [k]: next })
+      .then(() => showToast('Preference saved'))
+      .catch(err => {
+        setPrefs(prev => ({ ...prev, [k]: !next }));
+        showToast(err.response?.data?.message || 'Failed to save preference', 'error');
+      });
+  };
 
   return (
     <div >

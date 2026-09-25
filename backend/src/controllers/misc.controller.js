@@ -3,6 +3,8 @@ const { send, sendList } = require('../utils/http');
 const env = require('../config/env');
 const { sendMailSafe } = require('../services/mailer');
 const tpl = require('../services/emailTemplates');
+const payments = require('../services/payments');
+const { wantsEmail } = require('../services/prefs');
 
 /* ── Notifications ── */
 exports.listNotifications = async (req, res) =>
@@ -25,12 +27,19 @@ exports.plans = async (req, res) => send(res, await rpc('api_plans'));
 
 exports.mySubscription = async (req, res) => send(res, await rpc('api_my_subscription', {}, req.userId));
 
+// Manual gateway: plan activates immediately. Stripe: returns `redirect_url`
+// to the hosted checkout page (the Plans page already follows it).
 exports.purchase = async (req, res) => {
+  if ((await payments.gateway()) !== 'manual') {
+    const checkout = await payments.startCheckout(req.userId, req.body.plan_id);
+    return res.status(201).json({ success: true, redirect_url: checkout.redirect_url, data: checkout });
+  }
+
   const result = await rpc('api_purchase_plan', { p: req.body }, req.userId);
   send(res, result, 201);
 
   const pay = result.payment;
-  if (pay) {
+  if (pay && (await wantsEmail(req.userId, 'billing_notifs'))) {
     rpc('api_me', {}, req.userId)
       .then((me) => rpc('api_my_subscription', {}, req.userId).then((sub) => sendMailSafe({
         to: me.email,
@@ -44,6 +53,22 @@ exports.purchase = async (req, res) => {
 };
 
 exports.payments = async (req, res) => send(res, await rpc('api_payments', {}, req.userId));
+
+// Return from Stripe Checkout: /user/plans?session_id=...
+exports.confirmCheckout = async (req, res) =>
+  send(res, await payments.confirmSession(req.userId, String(req.query.session_id || '')));
+
+// Stripe -> us. Needs the raw body for signature verification (see app.js).
+exports.stripeWebhook = async (req, res) => {
+  await payments.handleWebhook(req.body, req.headers['stripe-signature']);
+  res.json({ received: true });
+};
+
+/* ── Notification preferences ── */
+exports.getNotificationPrefs = async (req, res) => send(res, await rpc('api_notification_prefs', {}, req.userId));
+
+exports.updateNotificationPrefs = async (req, res) =>
+  send(res, await rpc('api_update_notification_prefs', { p: req.body }, req.userId));
 
 exports.adminPlans = async (req, res) => send(res, await rpc('api_admin_plans', {}, req.userId));
 

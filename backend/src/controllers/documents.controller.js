@@ -3,6 +3,9 @@ const { rpc } = require('../config/db');
 const { adminClient } = require('../config/supabase');
 const { send, sendList } = require('../utils/http');
 const HttpError = require('../utils/HttpError');
+const { sendMailSafe } = require('../services/mailer');
+const { wantsEmail, contactFor } = require('../services/prefs');
+const tpl = require('../services/emailTemplates');
 
 const BUCKET = 'documents';
 
@@ -52,8 +55,18 @@ exports.download = async (req, res) => {
   res.send(Buffer.from(await data.arrayBuffer()));
 };
 
-exports.review = async (req, res) =>
-  send(res, await rpc('api_review_document', { p_id: req.params.id, p: req.body }, req.userId));
+exports.review = async (req, res) => {
+  const doc = await rpc('api_review_document', { p_id: req.params.id, p: req.body }, req.userId);
+  send(res, doc);
+
+  if (doc.status !== 'pending') {
+    (async () => {
+      if (!(await wantsEmail(doc.user_id, 'document_updates'))) return;
+      const who = await contactFor(doc.user_id);
+      if (who) sendMailSafe({ to: who.email, ...tpl.documentReviewed({ name: who.full_name, fileName: doc.original_name, status: doc.status, notes: doc.review_notes }) });
+    })().catch((err) => console.error('[mail] document review email failed:', err.message));
+  }
+};
 
 exports.remove = async (req, res) => {
   const path = await rpc('api_delete_document', { p_id: req.params.id }, req.userId);

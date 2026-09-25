@@ -18,11 +18,11 @@ export default function AdminDashboard() {
 
   const load = useCallback(() => {
     setLoading(true);
-    adminAPI.getDashboard()
+    adminAPI.getDashboard({ period })
       .then(r => setData(r.data.data))
       .catch(() => showToast('Failed to load dashboard', 'error'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [period]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -52,7 +52,13 @@ export default function AdminDashboard() {
   const { stats, deltas, recent_users, recent_cases, revenue_chart } = data || {};
 
   // FIX: Build real delta strings from API data
-  const buildDelta = (val) => val > 0 ? `+${val} this month` : val === 0 ? 'No change this month' : `${val} this month`;
+  const PERIOD_TEXT = {
+    '7d':  { delta: 'in last 7 days',  revenue: 'Revenue (7 Days)',  chart: 'Revenue (Last 7 Days)' },
+    '30d': { delta: 'in last 30 days', revenue: 'Revenue (30 Days)', chart: 'Revenue (Last 30 Days)' },
+    all:   { delta: 'all time',        revenue: 'Total Revenue',     chart: 'Revenue (Last 12 Months)' },
+  };
+  const periodText = PERIOD_TEXT[period] || PERIOD_TEXT['30d'];
+  const buildDelta = (val) => val > 0 ? `+${val} ${periodText.delta}` : val === 0 ? `No change ${periodText.delta}` : `${val} ${periodText.delta}`;
 
   return (
     <>
@@ -70,7 +76,7 @@ export default function AdminDashboard() {
               className="form-select"
               style={{ fontSize: 14, padding: '8px 32px 8px 12px', width: 'auto' }}
               value={period}
-              onChange={e => { setPeriod(e.target.value); load(); }}
+              onChange={e => setPeriod(e.target.value)}
             >
               <option value="7d">Last 7 days</option>
               <option value="30d">Last 30 days</option>
@@ -110,7 +116,7 @@ export default function AdminDashboard() {
 
           <StatCard
             icon={<FiDollarSign />}
-            label="Monthly Revenue"
+            label={periodText.revenue}
             value={`${currency} ${Number(stats?.monthly_revenue || 0).toLocaleString()}`}
             borderColor="#7C3AED"
           />
@@ -187,10 +193,10 @@ export default function AdminDashboard() {
         {revenue_chart?.length > 0 && (
           <div className="advisor-legal-cards h-auto">
             <h3 style={{ fontSize: 14, fontWeight: 700, fontFamily: 'var(--font-h)', color: 'var(--text-dark)', marginBottom: 20 }}>
-              Revenue (Last 6 Months)
+              {periodText.chart}
             </h3>
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={revenue_chart} barSize={32}>
+              <BarChart data={revenue_chart} barSize={period === '30d' ? 10 : 32}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#A6A5A4' }} />
                 <YAxis tick={{ fontSize: 12, fill: '#A6A5A4' }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />

@@ -41,8 +41,32 @@ export default function ConnectAdvisor() {
     name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
 
   const getSpecializations = (raw) => {
+    if (Array.isArray(raw)) return raw;
     try { return JSON.parse(raw || '[]'); } catch { return []; }
   };
+
+  // Tabs map to the specialisations advisors pick in their settings
+  const CATEGORY_MATCH = {
+    Property:  ['real estate', 'property'],
+    Civil:     ['contract', 'compliance', 'trademark', 'civil'],
+    Corporate: ['corporate', 'm&a', 'licens'],
+    Tax:       ['tax'],
+    Labor:     ['employment', 'labor', 'labour', 'visa'],
+  };
+  const inCategory = (a) => {
+    if (category === 'All') return true;
+    const specs = getSpecializations(a.specializations).map(s => String(s).toLowerCase());
+    return (CATEGORY_MATCH[category] || []).some(k => specs.some(s => s.includes(k)));
+  };
+  // No response-time data is tracked yet, so that option ranks by availability then rating
+  const byAvailability = (x, y) => (y.is_available === 1) - (x.is_available === 1);
+  const byRating       = (x, y) => Number(y.rating || 0) - Number(x.rating || 0);
+  const sorters = {
+    Available:       (x, y) => byAvailability(x, y) || byRating(x, y),
+    Rating:          (x, y) => byRating(x, y) || byAvailability(x, y),
+    'Response Time': (x, y) => byAvailability(x, y) || byRating(x, y),
+  };
+  const visibleAdvisors = advisors.filter(inCategory).sort(sorters[sort] || sorters.Available);
 
   return (
     <>
@@ -141,16 +165,16 @@ export default function ConnectAdvisor() {
               value={sort}
               onChange={e => setSort(e.target.value)}
             >
-              {SORT_OPTIONS.map(s => <option key={s}>Sort : {s}</option>)}
+              {SORT_OPTIONS.map(s => <option key={s} value={s}>Sort : {s}</option>)}
             </select>
             </div>
           </div>
         </div>
 
         {/* Advisor Grid */}
-        {loading ? <Spinner /> : advisors.length ? (
+        {loading ? <Spinner /> : visibleAdvisors.length ? (
           <div className='row'>
-            {advisors.map(a => {
+            {visibleAdvisors.map(a => {
               const specs    = getSpecializations(a.specializations);
               const available = a.is_available === 1;
               const initials  = getInitials(a.full_name);

@@ -5,6 +5,7 @@ const HttpError = require('../utils/HttpError');
 const statusFromDbError = (err) => {
   const msg = err.message || '';
   if (/not authenticated/i.test(msg)) return 401;
+  if (/under maintenance/i.test(msg)) return 503;
   if (/suspended|permission|only the/i.test(msg) || err.code === '42501') return 403;
   if (/not found/i.test(msg)) return 404;
   if (err.code === 'P0001') return 400;
