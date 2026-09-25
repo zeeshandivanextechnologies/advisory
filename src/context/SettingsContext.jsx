@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { publicApi } from '../services/api';
+import { publicAPI } from '../services/api';
 
 const SettingsContext = createContext(null);
 
@@ -9,7 +9,7 @@ export const SettingsProvider = ({ children }) => {
   const [loading,  setLoading]  = useState(true);
 
   useEffect(() => {
-    publicApi.get('/settings')
+    publicAPI.getSettings()
       .then(r => setSettings(r.data.data || {}))
       .catch(() => {/* silently fallback to defaults */})
       .finally(() => setLoading(false));

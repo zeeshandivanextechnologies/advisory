@@ -103,8 +103,9 @@ function AppRoutes() {
       <Route path="/auth/register"        element={<PublicOnly><Register /></PublicOnly>} />
       <Route path="/auth/forgot-password" element={<PublicOnly><ForgotPassword /></PublicOnly>} />
       <Route path="/auth/otp"             element={<PublicOnly><OTP /></PublicOnly>} />
-      <Route path="/auth/reset-password"  element={<PublicOnly><NewPassword /></PublicOnly>} />
-      <Route path="/auth/new-password"    element={<PublicOnly><NewPassword /></PublicOnly>} />
+      {/* Not PublicOnly: the reset link arrives with a recovery session already signed in */}
+      <Route path="/auth/reset-password"  element={<NewPassword />} />
+      <Route path="/auth/new-password"    element={<NewPassword />} />
 
       <Route path="/onboarding/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
       <Route path="/onboarding/needs"   element={<ProtectedRoute><Needs /></ProtectedRoute>} />
@@ -126,9 +127,6 @@ function AppRoutes() {
         <Route path="session-notes"     element={<ErrorBoundary><SessionNotes /></ErrorBoundary>} />
         <Route path="plans"             element={<ErrorBoundary><Plans /></ErrorBoundary>} />
       </Route>
-
-      {/* rodec18792@poisonword.com */}
-      {/* Ansari@123 */}
 
       <Route path="/user/video-call/:id" element={<ProtectedRoute roles={['user','advisor']}><VideoCall /></ProtectedRoute>} />
       <Route path="/user/video-call"     element={<ProtectedRoute roles={['user','advisor']}><VideoCall /></ProtectedRoute>} />

@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../../services/api';
+import { supabase } from '../../lib/supabase';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { MdCheckBox } from 'react-icons/md';
 
 export default function NewPassword() {
   const navigate  = useNavigate();
-  const location  = useLocation();
-  const token     = new URLSearchParams(location.search).get('token') || '';
+  // The emailed reset link signs the user in with a recovery session
+  const [token, setToken] = useState(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setToken(session ? 'session' : ''));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) setToken('session');
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const [form, setForm] = useState({
     password: '', confirm: '',
@@ -47,7 +55,7 @@ export default function NewPassword() {
     setError('');
     setLoading(true);
     try {
-      await authAPI.resetPassword({ token, password: form.password });
+      await authAPI.resetPassword({ password: form.password });
       setSuccess(true);
       setTimeout(() => navigate('/auth/login'), 2500);
     } catch (err) {

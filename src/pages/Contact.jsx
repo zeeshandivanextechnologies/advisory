@@ -26,7 +26,7 @@ function Contact() {
     try {
 
       await import("../services/api").then((m) =>
-        m.default.post("/contact", form),
+        m.publicAPI.contact(form),
       );
       setSent(true);
     } catch (err) {

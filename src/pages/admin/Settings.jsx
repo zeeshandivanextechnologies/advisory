@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AppHeader from '../../components/layout/AppHeader';
 import { Spinner, showToast } from '../../components/common/index';
 import { adminAPI } from '../../services/api';
-import api from '../../services/api';
+import { subscriptionAPI } from '../../services/api';
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState({});
@@ -16,7 +16,7 @@ export default function AdminSettings() {
   useEffect(() => {
     Promise.all([
       adminAPI.getSettings(),
-      api.get('/subscriptions/admin/plans'),
+      subscriptionAPI.adminGetPlans(),
     ])
       .then(([s, p]) => {
         const sd = s.data.data || {};
@@ -46,8 +46,8 @@ export default function AdminSettings() {
     setPlanSaving(true);
     try {
       const features = newPlan.features.split('\n').map(f => f.trim()).filter(Boolean);
-      await api.post('/subscriptions/admin/plans', { ...newPlan, features });
-      const p = await api.get('/subscriptions/admin/plans');
+      await subscriptionAPI.adminCreatePlan({ ...newPlan, features });
+      const p = await subscriptionAPI.adminGetPlans();
       setPlans(p.data.data || []);
       setNewPlan({ name: '', price: '', currency: 'QAR', duration_days: 30, description: '', features: '' });
       showToast('Plan created successfully');
@@ -57,7 +57,7 @@ export default function AdminSettings() {
 
   const togglePlan = async (plan) => {
     try {
-      await api.put(`/subscriptions/admin/plans/${plan.id}`, { is_active: plan.is_active ? 0 : 1 });
+      await subscriptionAPI.adminUpdatePlan(plan.id, { is_active: plan.is_active ? 0 : 1 });
       setPlans(prev => prev.map(p => p.id === plan.id ? { ...p, is_active: p.is_active ? 0 : 1 } : p));
       showToast(`Plan ${plan.is_active ? 'deactivated' : 'activated'}`);
     } catch { showToast('Failed to update plan', 'error'); }

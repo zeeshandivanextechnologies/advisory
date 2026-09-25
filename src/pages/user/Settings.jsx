@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
 import { showToast, Modal, Spinner } from '../../components/common/index';
 import { userAPI, authAPI } from '../../services/api';
-import api from '../../services/api';
+import { subscriptionAPI, paymentAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useSettings } from '../../context/SettingsContext';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
@@ -163,9 +163,9 @@ function PlanTab() {
 
   useEffect(() => {
     Promise.all([
-      api.get('/subscriptions/plans'),
-      api.get('/subscriptions/my-subscription'),
-      api.get('/payments'),
+      subscriptionAPI.getPlans(),
+      subscriptionAPI.getMyPlan(),
+      paymentAPI.list(),
     ])
       .then(([p, s, pay]) => {
         setPlans(p.data.data || []);

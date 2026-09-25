@@ -1,114 +1,227 @@
-import axios from 'axios';
+import { supabase } from '../lib/supabase';
 
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || '/api',
-  timeout: 15000,
-  headers: { 'Content-Type': 'application/json' },
-});
+/*
+ * Serverless API layer on Supabase.
+ *
+ * Every function keeps the old axios contract so pages don't change:
+ * it resolves to `{ data: { data, meta? } }` and rejects with an error that has
+ * `err.response.data.message`. All business logic and permission checks live in
+ * the `api_*` Postgres functions (supabase/migrations).
+ */
 
-/* ── Public API (no auth interceptor) — for settings, plans, etc. ── */
-export const publicApi = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || '/api',
-  timeout: 15000,
-  headers: { 'Content-Type': 'application/json' },
-});
+const DOCS_BUCKET = 'documents';
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('aan_token');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+const toError = (message, status = 400) => {
+  const err = new Error(message || 'Something went wrong');
+  err.response = { status, data: { message: err.message } };
+  return err;
+};
 
-api.interceptors.response.use(
-  (res) => res,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('aan_token');
-      localStorage.removeItem('aan_user');
+const SESSION_ERRORS = /not authenticated|jwt|permission denied for function|suspended/i;
+
+const rpc = async (fn, args) => {
+  const { data, error } = await supabase.rpc(fn, args);
+  if (error) {
+    // Equivalent of the old 401 interceptor: drop the session and go to login
+    if (SESSION_ERRORS.test(error.message) && !window.location.pathname.startsWith('/auth')) {
+      await supabase.auth.signOut();
       window.location.href = '/auth/login';
     }
-    return Promise.reject(error);
+    throw toError(error.message);
   }
-);
+  return data;
+};
 
+const ok     = (data) => ({ data: { success: true, data } });
+const okList = (res)  => ({ data: { success: true, data: res.data, meta: res.meta } });
+
+const authFail = (error) => { if (error) throw toError(error.message, error.status); };
+
+/* ── Auth ──────────────────────────────────────────────────── */
 export const authAPI = {
-  login:          (data) => api.post('/auth/login', data),
-  register:       (data) => api.post('/auth/register', data),
-  verifyOtp:      (data) => api.post('/auth/verify-otp', data),
-  resendOtp:      (data) => api.post('/auth/resend-otp', data),
-  forgotPassword: (data) => api.post('/auth/forgot-password', data),
-  resetPassword:  (data) => api.post('/auth/reset-password', data),
-  getMe:          ()     => api.get('/auth/me'),
-  changePassword: (data) => api.put('/auth/change-password', data),
+  login: async ({ email, password }) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    authFail(error);
+    try {
+      const user = await rpc('api_login');
+      return { data: { token: data.session.access_token, user } };
+    } catch (err) {
+      await supabase.auth.signOut();
+      throw err;
+    }
+  },
+
+  register: async ({ email, password, full_name, role }) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name, role },
+        emailRedirectTo: `${window.location.origin}/auth/login`,
+      },
+    });
+    authFail(error);
+    return { data: { success: true } };
+  },
+
+  verifyOtp: async ({ email, otp }) => {
+    let { data, error } = await supabase.auth.verifyOtp({ email, token: otp, type: 'email' });
+    if (error) ({ data, error } = await supabase.auth.verifyOtp({ email, token: otp, type: 'signup' }));
+    authFail(error);
+    const user = await rpc('api_login');
+    return { data: { token: data.session?.access_token, user } };
+  },
+
+  resendOtp: async ({ email }) => {
+    const { error } = await supabase.auth.resend({ type: 'signup', email });
+    authFail(error);
+    return ok(null);
+  },
+
+  forgotPassword: async ({ email }) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+    authFail(error);
+    return ok(null);
+  },
+
+  // The reset link signs the user in with a recovery session; set the new
+  // password on it, then sign out so they log in fresh.
+  resetPassword: async ({ password }) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    authFail(error);
+    await supabase.auth.signOut();
+    return ok(null);
+  },
+
+  getMe: async () => ({ data: { user: await rpc('api_me') } }),
+
+  changePassword: async ({ current_password, new_password }) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw toError('Not authenticated', 401);
+    const { error: verifyErr } = await supabase.auth.signInWithPassword({ email: user.email, password: current_password });
+    if (verifyErr) throw toError('Current password is incorrect');
+    const { error } = await supabase.auth.updateUser({ password: new_password });
+    authFail(error);
+    return ok(null);
+  },
 };
 
+/* ── Users ─────────────────────────────────────────────────── */
 export const userAPI = {
-  getDashboard:          ()         => api.get('/users/dashboard'),
-  getProfile:            ()         => api.get('/users/profile'),
-  updateProfile:         (data)     => api.put('/users/profile', data),
-  updateAvatar:          (fd)       => api.put('/users/avatar', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
-  getConsultations:      (p)        => api.get('/users/consultations', { params: p }),
-  bookConsultation:      (data)     => api.post('/users/consultations', data),
-  updateConsultation:    (id, data) => api.put(`/users/consultations/${id}`, data),
-  getConsultationJoin:   (id)       => api.get(`/users/consultations/${id}/join`),
+  getDashboard:        ()         => rpc('api_user_dashboard').then(ok),
+  getProfile:          ()         => rpc('api_me').then(ok),
+  updateProfile:       (data)     => rpc('api_update_profile', { p: data }).then(ok),
+  getConsultations:    (p = {})   => rpc('api_consultations', { p }).then(ok),
+  bookConsultation:    (data)     => rpc('api_book_consultation', { p: data }).then(ok),
+  updateConsultation:  (id, data) => rpc('api_update_consultation', { p_id: Number(id), p: data }).then(ok),
+  getConsultationJoin: (id)       => rpc('api_consultation_join', { p_id: Number(id) }).then(ok),
 };
 
+/* ── Advisors ──────────────────────────────────────────────── */
 export const advisorAPI = {
-  list:          (p)    => api.get('/advisors', { params: p }),
-  getById:       (id)   => api.get(`/advisors/${id}`),
-  getDashboard:  ()     => api.get('/advisors/dashboard'),
-  getProfile:    ()     => api.get('/advisors/profile'),   // FIX: added — fetches own full profile
-  updateProfile: (data) => api.put('/advisors/profile', data),
+  list:          (p = {}) => rpc('api_advisors', { p }).then(ok),
+  getDashboard:  ()       => rpc('api_advisor_dashboard').then(ok),
+  getProfile:    ()       => rpc('api_advisor_profile').then(ok),
+  updateProfile: (data)   => rpc('api_update_advisor_profile', { p: data }).then(ok),
 };
 
+/* ── Cases ─────────────────────────────────────────────────── */
 export const caseAPI = {
-  list:   (p)        => api.get('/cases', { params: p }),
-  getById:(id)       => api.get(`/cases/${id}`),
-  create: (data)     => api.post('/cases', data),
-  update: (id, data) => api.put(`/cases/${id}`, data),
-  delete: (id)       => api.delete(`/cases/${id}`),
+  list:   (p = {})   => rpc('api_cases', { p }).then(okList),
+  create: (data)     => rpc('api_create_case', { p: data }).then(ok),
+  update: (id, data) => rpc('api_update_case', { p_id: Number(id), p: data }).then(ok),
 };
 
+/* ── Documents (files in the private `documents` storage bucket) ── */
 export const documentAPI = {
-  list:   (p)        => api.get('/documents', { params: p }),
-  upload: (fd)       => api.post('/documents', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
-  download: (id)     => api.get(`/documents/${id}/download`, { responseType: 'blob' }),
-  review: (id, data) => api.put(`/documents/${id}/review`, data),
-  delete: (id)       => api.delete(`/documents/${id}`),
+  list: (p = {}) => rpc('api_documents', { p }).then(okList),
+
+  // Accepts the same FormData the page already builds: `file`, `category`, optional `case_id`
+  upload: async (fd) => {
+    const file = fd.get('file');
+    if (!file) throw toError('Please choose a file');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw toError('Not authenticated', 401);
+
+    const safeName = file.name.replace(/[^\w.-]+/g, '_');
+    const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
+    const { error: upErr } = await supabase.storage.from(DOCS_BUCKET).upload(path, file, {
+      contentType: file.type || 'application/octet-stream',
+    });
+    if (upErr) throw toError(upErr.message);
+
+    try {
+      return ok(await rpc('api_create_document', {
+        p: {
+          file_path: path,
+          original_name: file.name,
+          file_type: file.type || 'application/octet-stream',
+          file_size: file.size,
+          category: fd.get('category') || 'other',
+          case_id: fd.get('case_id') || null,
+        },
+      }));
+    } catch (err) {
+      await supabase.storage.from(DOCS_BUCKET).remove([path]);
+      throw err;
+    }
+  },
+
+  // Resolves to `{ data: Blob }`, like axios with responseType 'blob'
+  download: async (id) => {
+    const path = await rpc('api_document_path', { p_id: Number(id) });
+    const { data, error } = await supabase.storage.from(DOCS_BUCKET).download(path);
+    if (error) throw toError(error.message);
+    return { data };
+  },
+
+  review: (id, data) => rpc('api_review_document', { p_id: Number(id), p: data }).then(ok),
+
+  delete: async (id) => {
+    const path = await rpc('api_delete_document', { p_id: Number(id) });
+    await supabase.storage.from(DOCS_BUCKET).remove([path]);
+    return ok(null);
+  },
 };
 
+/* ── Notifications ─────────────────────────────────────────── */
 export const notifAPI = {
-  list:     (p)    => api.get('/notifications', { params: p }),
-  markRead: (data) => api.post('/notifications/read', data),
+  list:     (p = {})    => rpc('api_notifications', { p }).then(okList),
+  markRead: (data = {}) => rpc('api_mark_notifications_read', { p: data }).then(ok),
 };
 
+/* ── Admin ─────────────────────────────────────────────────── */
 export const adminAPI = {
-  getDashboard:        ()         => api.get('/admin/dashboard'),
-  getUsers:            (p)        => api.get('/admin/users', { params: p }),
-  toggleUserStatus:    (id)       => api.put(`/admin/users/${id}/toggle`),
-  getAdvisors:         (p)        => api.get('/admin/advisors', { params: p }),
-  updateAdvisorStatus: (id, data) => api.put(`/admin/advisors/${id}/status`, data),
-  getRevenue:          (p)        => api.get('/admin/revenue', { params: p }),
-  getSettings:         ()         => api.get('/admin/settings'),
-  updateSettings:      (data)     => api.put('/admin/settings', data),
+  getDashboard:        ()         => rpc('api_admin_dashboard').then(ok),
+  getUsers:            (p = {})   => rpc('api_admin_users', { p }).then(okList),
+  toggleUserStatus:    (id)       => rpc('api_admin_toggle_user', { p_id: id }).then(ok),
+  getAdvisors:         (p = {})   => rpc('api_admin_advisors', { p }).then(okList),
+  updateAdvisorStatus: (id, data) => rpc('api_admin_update_advisor_status', { p_id: Number(id), p_status: data.status }).then(ok),
+  getRevenue:          ()         => rpc('api_admin_revenue').then(ok),
+  getSettings:         ()         => rpc('api_admin_settings').then(ok),
+  updateSettings:      (data)     => rpc('api_admin_update_settings', { p: data }).then(ok),
+};
+
+/* ── Subscriptions & payments ──────────────────────────────── */
+export const subscriptionAPI = {
+  getPlans:        ()      => rpc('api_plans').then(ok),
+  getMyPlan:       ()      => rpc('api_my_subscription').then(ok),
+  purchase:        (data)  => rpc('api_purchase_plan', { p: data }).then(ok),
+  adminGetPlans:   ()      => rpc('api_admin_plans').then(ok),
+  adminCreatePlan: (data)  => rpc('api_admin_save_plan', { p_id: null, p: data }).then(ok),
+  adminUpdatePlan: (id, d) => rpc('api_admin_save_plan', { p_id: Number(id), p: d }).then(ok),
+  adminDeletePlan: (id)    => rpc('api_admin_delete_plan', { p_id: Number(id) }).then(ok),
 };
 
 export const paymentAPI = {
-  create: (data) => api.post('/payments', data),
-  list:   (p)    => api.get('/payments', { params: p }),
+  list: () => rpc('api_payments').then(ok),
 };
 
-export const subscriptionAPI = {
-  getPlans:       ()     => api.get('/subscriptions/plans'),
-  getMyPlan:      ()     => api.get('/subscriptions/my-subscription'),
-  purchase:       (data) => api.post('/subscriptions/purchase', data),
-  adminGetPlans:  ()     => api.get('/subscriptions/admin/plans'),
-  adminCreatePlan:(data) => api.post('/subscriptions/admin/plans', data),
-  adminUpdatePlan:(id,d) => api.put(`/subscriptions/admin/plans/${id}`, d),
-  adminDeletePlan:(id)   => api.delete(`/subscriptions/admin/plans/${id}`),
+/* ── Public (no login needed) ──────────────────────────────── */
+export const publicAPI = {
+  getSettings: ()     => rpc('api_public_settings').then(ok),
+  getPlans:    ()     => rpc('api_plans').then(ok),
+  contact:     (data) => rpc('api_contact', { p: data }).then(ok),
 };
-
-export default api;

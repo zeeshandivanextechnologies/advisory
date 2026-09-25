@@ -128,7 +128,7 @@ export default function AdminDashboard() {
               <table className="table billing-table align-middle mb-0 ai-case-table">
               <thead><tr><th>User</th><th>Plan</th><th>Joined</th><th>Status</th></tr></thead>
               <tbody>
-                {!recent_users?.length ? recent_users.map(u => (
+                {recent_users?.length ? recent_users.map(u => (
                   <tr key={u.id}>
                     <td>
                       <div className='plan-table-content'>
@@ -160,7 +160,7 @@ export default function AdminDashboard() {
               <table className="table billing-table align-middle mb-0 ai-case-table">
               <thead><tr><th>Case</th><th>Category</th><th>User</th><th>Status</th></tr></thead>
               <tbody>
-                {!recent_cases?.length ? recent_cases.map(c => (
+                {recent_cases?.length ? recent_cases.map(c => (
                   <tr key={c.id}>
                     <td>
                       <div className='plan-table-content'>

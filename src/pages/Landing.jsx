@@ -549,7 +549,7 @@ function Pricing() {
 
   React.useEffect(() => {
     import('../services/api').then(m =>
-      m.publicApi.get('/subscriptions/plans')
+      m.publicAPI.getPlans()
         .then(r => setPlans(r.data.data || []))
         .catch(() => { })
         .finally(() => setLoading(false))

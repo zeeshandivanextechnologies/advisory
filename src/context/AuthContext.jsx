@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../services/api';
+import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext(null);
 
@@ -7,34 +8,27 @@ export const AuthProvider = ({ children }) => {
   const [user,    setUser]    = useState(null);
   const [loading, setLoading] = useState(true);
 
-  /* ── Bootstrap: verify token against server, not just localStorage ── */
+  /* ── Bootstrap: restore the Supabase session and load the profile ── */
   useEffect(() => {
-    const token = localStorage.getItem('aan_token');
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-    // FIX: Always verify token validity with the server on startup
-    authAPI.getMe()
-      .then(({ data }) => {
-        setUser(data.user);
-        // Sync updated user data back to localStorage
-        localStorage.setItem('aan_user', JSON.stringify(data.user));
-      })
-      .catch(() => {
-        // Token is expired or invalid — clear everything
-        localStorage.removeItem('aan_token');
-        localStorage.removeItem('aan_user');
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => (session ? authAPI.getMe() : null))
+      .then(res => setUser(res?.data.user || null))
+      .catch(async () => {
+        await supabase.auth.signOut();
         setUser(null);
       })
       .finally(() => setLoading(false));
+
+    // Keep in sync with sign-outs from other tabs or expired refresh tokens
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') setUser(null);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   /* ── Login ───────────────────────────────────────────────── */
   const login = useCallback(async (email, password) => {
     const { data } = await authAPI.login({ email, password });
-    localStorage.setItem('aan_token', data.token);
-    localStorage.setItem('aan_user',  JSON.stringify(data.user));
     setUser(data.user);
     return data.user;
   }, []);
@@ -48,26 +42,19 @@ export const AuthProvider = ({ children }) => {
   /* ── Verify OTP ──────────────────────────────────────────── */
   const verifyOtp = useCallback(async (email, otp) => {
     const { data } = await authAPI.verifyOtp({ email, otp });
-    localStorage.setItem('aan_token', data.token);
-    localStorage.setItem('aan_user',  JSON.stringify(data.user));
     setUser(data.user);
     return data.user;
   }, []);
 
   /* ── Logout ──────────────────────────────────────────────── */
   const logout = useCallback(() => {
-    localStorage.removeItem('aan_token');
-    localStorage.removeItem('aan_user');
+    supabase.auth.signOut();
     setUser(null);
   }, []);
 
-  /* ── Update stored user (partial update) ────────────────── */
+  /* ── Update in-memory user (partial update) ─────────────── */
   const updateUser = useCallback((updates) => {
-    setUser(prev => {
-      const next = { ...prev, ...updates };
-      localStorage.setItem('aan_user', JSON.stringify(next));
-      return next;
-    });
+    setUser(prev => ({ ...prev, ...updates }));
   }, []);
 
   return (

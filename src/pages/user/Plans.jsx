@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
 import { Spinner, showToast } from '../../components/common/index';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import { subscriptionAPI, authAPI } from '../../services/api';
 import { useSettings } from '../../context/SettingsContext';
 import { IoIosCheckbox } from 'react-icons/io';
 
@@ -18,8 +18,8 @@ export default function Plans() {
 
   const loadData = () =>
     Promise.all([
-      api.get('/subscriptions/plans'),
-      api.get('/subscriptions/my-subscription'),
+      subscriptionAPI.getPlans(),
+      subscriptionAPI.getMyPlan(),
     ])
       .then(([p, s]) => {
         setPlans(p.data.data || []);
@@ -34,16 +34,16 @@ export default function Plans() {
     if (plan.price === 0) return showToast('You are already on the free plan');
     setBuying(plan.id);
     try {
-      const res = await api.post('/subscriptions/purchase', { plan_id: plan.id, payment_method: 'card' });
+      const res = await subscriptionAPI.purchase({ plan_id: plan.id, payment_method: 'card' });
       if (res.data.redirect_url) {
         window.location.href = res.data.redirect_url;
       } else {
         showToast(`${plan.name} plan activated! Check your email.`);
         // FIX: updateUser — not setUser (setUser doesn't exist in AuthContext)
-        const me = await api.get('/auth/me');
+        const me = await authAPI.getMe();
         if (me.data.user) updateUser(me.data.user);
         // Refresh subscription data
-        const s = await api.get('/subscriptions/my-subscription');
+        const s = await subscriptionAPI.getMyPlan();
         setMySub(s.data.data);
       }
     } catch (err) {
