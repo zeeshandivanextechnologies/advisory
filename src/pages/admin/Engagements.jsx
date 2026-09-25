@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, EmptyState, Modal, showToast } from '../../components/common/index';
 import { journeyAPI, serviceAPI, adminAPI } from '../../services/api';
@@ -59,11 +59,13 @@ function ProposalsTab({ openEditId, onSent }) {
     payment_terms: pr.payment_terms || '', valid_until: pr.valid_until,
   });
 
-  // Coming from Services → Requests → "Create proposal"
+  // Coming from Services → Requests → "Create proposal": open that draft once
+  const openedRef = useRef(false);
   useEffect(() => {
-    if (!openEditId || !rows.length) return;
+    if (openedRef.current || !openEditId || !rows.length) return;
     const pr = rows.find(x => x.id === openEditId);
-    if (pr) openEdit(pr);
+    if (pr) { openedRef.current = true; if (pr.status === 'draft') openEdit(pr); }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openEditId, rows]);
 
   const save = async (andSend) => {
@@ -430,7 +432,15 @@ function FollowupsTab() {
 /* ═══ Page ═══════════════════════════════════════════════════ */
 export default function AdminEngagements() {
   const location = useLocation();
-  const [tab, setTab] = useState(location.state?.tab || 'proposals');
+  const navigate = useNavigate();
+  // Read the hand-off from Services once, then drop it from history so a
+  // page reload doesn't reopen the proposal modal
+  const [handoff] = useState(() => location.state || {});
+  const [tab, setTab] = useState(handoff.tab || 'proposals');
+  useEffect(() => {
+    if (location.state) navigate(location.pathname, { replace: true, state: null });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [reloadKey, setReloadKey] = useState(0);
   const TABS = [
     { id: 'proposals',   label: 'Proposals' },
@@ -462,7 +472,7 @@ export default function AdminEngagements() {
           </div>
         </div>
 
-        {tab === 'proposals'   && <ProposalsTab openEditId={location.state?.proposalId} onSent={() => setReloadKey(k => k + 1)} />}
+        {tab === 'proposals'   && <ProposalsTab openEditId={handoff.proposalId} onSent={() => setReloadKey(k => k + 1)} />}
         {tab === 'engagements' && <EngagementsTab reloadKey={reloadKey} />}
         {tab === 'invoices'    && <InvoicesTab />}
         {tab === 'followups'   && <FollowupsTab />}
