@@ -1,0 +1,573 @@
+@media (max-width: 1699px) {
+  .filters {
+    flex-wrap: wrap;
+  }
+
+}
+
+@media (max-width: 1399px) {
+  .account-step-one::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    right: -70px;
+    width: 76%;
+    height: 1px;
+    background: #1B1B1B1A;
+  }
+
+  .account-step-crd {
+    width: 185px;
+  }
+
+  /* .nw-bed-icon{
+    font-size: 25px;
+  } */
+  .filters {
+    flex-wrap: wrap;
+  }
+
+  .client-login-container {
+    padding: 0 50px 0px 50px;
+  }
+}
+
+@media (max-width: 1199px) {
+  .admin-frm-vendor-bx {
+    padding: 0 50px 50px 50px;
+  }
+
+  .filters {
+    flex-wrap: wrap;
+  }
+
+  .account-step-crd {
+    width: 130px;
+  }
+
+  .account-step-one::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    right: -43px;
+    width: 66%;
+    height: 1px;
+    background: #1B1B1B1A;
+  }
+
+  .client-login-container {
+    padding: 0 50px 0px 50px;
+  }
+
+}
+
+
+@media (min-width: 992px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+
+  .sidebar-close-btn {
+    display: none;
+  }
+
+  .dashbrd-left-asidebar {
+    position: static;
+    width: auto;
+    height: auto;
+    box-shadow: none;
+    left: 0;
+  }
+}
+
+@media (max-width : 991px) {
+
+  .dashbrd-left-asidebar {
+    border-radius: 0;
+  }
+
+  .mobile-menu-btn {
+    color: #fff !important;
+  }
+
+  .dashboard-saller-sec {
+    padding: 20px 0;
+  }
+
+  .dashbrd-left-asidebar {
+    padding: 50px 15px;
+  }
+
+  .tp-saller-header .header-logo .logo-img {
+    display: none;
+  }
+
+  .dash-search-dta-bx {
+    flex-wrap: wrap;
+  }
+
+  .admn-mob-close-bx {
+    padding-top: 8px;
+    padding-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+  }
+
+  .tp-header-search-br {
+    display: none;
+  }
+
+  /* Admin Resposnive Start
+   */
+  .client-dashboard-left-side {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 300px;
+    z-index: 1050;
+    background-color: #000;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease;
+    overflow-y: scroll !important;
+    height: 100%;
+  }
+
+  .modal-close-btn {
+    color: #fff;
+  }
+
+  .client-dashboard-left-side {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-y: scroll;
+  }
+
+  .client-dashboard-left-side::-webkit-scrollbar {
+    display: none;
+  }
+
+  .client-dashboard-left-side.mobile-show {
+    transform: translateX(0);
+  }
+
+  .client-mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1040;
+    display: none;
+  }
+
+  /* .client-mobile-overlay.show {
+    display: block !important;
+  } */
+
+
+  /* Admin Resposnive End
+   */
+
+  .dashboard-right-side .client-tp-header-section .tp-right-admin-bx {
+    gap: 10px;
+  }
+
+  /* Aunai AI Legal Start */
+
+  .settings-tabs {
+    min-height: 100%;
+    padding: 0px !important;
+    border-right: 0px;
+  }
+
+  .profile-right-bar {
+    padding-right: 0px;
+    padding-top: 0px;
+  }
+
+  .main-content {
+    padding: 12px !important;
+  }
+
+  .settings-header {
+    padding: 0;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+  }
+
+  .settings-header p {
+    line-height: 100%;
+    margin-bottom: 0px;
+  }
+
+  .profile-btm-line {
+    padding: 0;
+    margin-bottom: 10px;
+  }
+
+  .ai-aunai-chat-overlay {
+    right: 20px;
+  }
+
+  .ai-aunai-chat-container {
+    width: 330px;
+  }
+
+  .contract__ai_preview {
+    max-height: 400px;
+    border-radius: 0;
+    scrollbar-width: none;
+  }
+
+  .contract__ai_preview::-webkit-scrollbar {
+    display: none;
+  }
+
+
+  .case-search-box {
+    flex-direction: column;
+  }
+
+  .case-ai-mobile .ai-custom-frm-bx {
+    width: 100%;
+  }
+
+  .case-search-box .nav-pills {
+    flex-wrap: nowrap;
+  }
+
+  .case-search-box .filter-tabs {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .case-search-box .filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ai-case-sort-wrapper {
+    margin-top: 10px;
+  }
+
+  .document-tab {
+    flex-wrap: wrap;
+  }
+
+  .document-tab__info {
+    width: 100%;
+  }
+
+  .document-tab__actions {
+    width: 100%;
+    justify-content: end;
+  }
+
+  .calendar-date {
+    height: 40px;
+  }
+
+  .time-slots .time-slot {
+    width: calc(50% - 10px);
+  }
+
+  .time-slots {
+    justify-content: space-between;
+  }
+
+  .ai-aunai-assistant-cards {
+    height: 600px;
+  }
+
+
+  /* Video Calling start */
+  .ai_aunai_vd_calling_sidebar {
+    width: 260px;
+  }
+
+  .ai_aunai_vd_calling_title {
+    font-size: 14px;
+  }
+
+
+  /* Video Calling End */
+
+
+  /* Aunai AI Legal End */
+}
+
+
+
+@media (max-width : 767px) {
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .innr-title {
+    font-size: 14px;
+  }
+
+  .account-step-crd {
+    width: 100px;
+  }
+
+  .account-step-one::after {
+    content: "";
+    position: absolute;
+    top: 22px;
+    right: -28px;
+    width: 56%;
+
+    height: 1px;
+    background: #1B1B1B1A;
+  }
+
+  .account-step-crd h6 {
+    font-size: 12px;
+  }
+
+  .notification-card {
+    width: 320px;
+  }
+
+  .admin-picture-box img {
+    min-height: 350px;
+  }
+
+  .admin-picture-box::after {
+    height: 500px;
+  }
+
+  .admin-picture-box {
+    height: auto;
+  }
+
+  .client-login-container {
+    padding: 30px 0 30px 0;
+  }
+
+  .mobile-case-text {
+    display: none;
+  }
+
+  .tp-right-admin-bx .lg-thm-btn {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .expert-device-box {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .expert-device-box .ai-lg-thm-btn {
+    width: 100%;
+  }
+
+  .ai-legal-mobile .ai-upload-title {
+    display: none;
+  }
+
+  .ai-plus-chat-box {
+    position: absolute;
+    bottom: 14px;
+    left: 10px;
+  }
+
+  .ai-aunai-send-btn {
+    height: 35px;
+    width: 35px;
+    line-height: 35px;
+  }
+
+  .ai-aunai-send-box {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+  }
+
+  .ai-aunai-input-box .ai-aunai-input {
+    padding-right: 50px;
+    padding-left: 30px;
+  }
+
+  .ai-title {
+    font-size: 20px;
+  }
+
+  .ai-legal-mobile .ai-lg-thm-btn {
+    padding: 8px 10px;
+  }
+
+  .ai-legal-mobile .lg-white-btn {
+    padding: 8px 10px;
+  }
+
+  .dashboard-right-side .dash-vendr-header-left-bx {
+    gap: 7px;
+  }
+
+  .aunai-upgrade-card {
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+  }
+
+
+  .aunai-upgrade-card .ai-anuai-upgrade-btn {
+    width: 100%;
+  }
+
+  .ai-assistant-box .ai-aunai-bubble {
+    max-width: 100%;
+  }
+
+  .ai-aunai-input-box .ai-aunai-input {
+    height: 50px;
+  }
+
+  .ai-plus-btn {
+    font-size: 14px;
+  }
+
+  .ai-assistant-box .ai-aunai-header h5 {
+    font-size: 16px;
+  }
+
+  .docs-stats {
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .docs-stat-chip {
+    width: calc(50% - 10px);
+  }
+
+  .document-upload-box {
+    margin-bottom: 15px;
+  }
+
+  .step-item {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mobile-ai-secure-title {
+    display: none;
+  }
+
+  .desk-ai-secure-icon {
+    display: block;
+  }
+
+  .ai-secure-auth-app {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-security-device {
+    padding: 8px 0;
+  }
+
+  .step-label {
+    margin-left: 0;
+  }
+
+  .consultations-card {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .consultations-card .schedule-main-box {
+    width: 100%;
+  }
+
+  .consultations-card .consultations-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .backend-server-status-box {
+    flex-direction: column;
+    gap: 0px;
+    padding: 5px;
+  }
+
+
+
+}
+
+@media (max-width : 567px) {
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .account-step-crd {
+    width: 70px;
+  }
+
+
+
+  .account-step-one::after {
+    content: "";
+    position: absolute;
+    top: 22px;
+    right: -13px;
+    width: 38%;
+    height: 1px;
+    background: #1B1B1B1A;
+  }
+
+
+
+  .nw-thm-btn {
+    width: 100%;
+  }
+
+  .timeline-container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .timeline-content h3 {
+    font-size: 14px;
+  }
+
+  .timeline-content p {
+    font-size: 12px;
+  }
+
+
+
+}
+
+
+@media (max-width : 365px) {
+
+  .account-step-crd {
+    width: 60px;
+  }
+
+  .account-step-one::after {
+    content: "";
+    position: absolute;
+    top: 22px;
+    right: -8px;
+    width: 28%;
+    height: 1px;
+    background: #1B1B1B1A;
+  }
+
+
+
+
+}
