@@ -118,3 +118,25 @@ exports.deliverableReleased = ({ name, engagement, title }) => ({
   ].join('')),
   text: `${title} for ${engagement} is ready: ${engagementsLink()}`,
 });
+
+exports.referralConsent = ({ name, partner, purpose }) => ({
+  subject: `Your consent: introduction to ${partner}`,
+  html: layout('We would like to introduce you', [
+    p(`Hi ${esc(name)},`),
+    p(`We would like to introduce you to <b>${esc(partner)}</b>, one of our vetted partners.`),
+    p(`<i>Purpose:</i> ${esc(purpose)}`),
+    p('We only share your details with your consent. Please review and give or decline consent.'),
+    button(`${env.frontendUrl}/user/services`, 'Review introduction'),
+  ].join('')),
+  text: `We would like to introduce you to ${partner}. Purpose: ${purpose}. Give or decline consent: ${env.frontendUrl}/user/services`,
+});
+
+exports.referralIntroduced = ({ name, partner, purpose }) => ({
+  subject: `Introduction made: ${partner}`,
+  html: layout('Introduction made', [
+    p(`Hi ${esc(name)},`),
+    p(`As agreed, we have introduced you to <b>${esc(partner)}</b> for: ${esc(purpose)}. They will be in touch; we stay your point of contact throughout.`),
+    button(`${env.frontendUrl}/user/services`, 'View my introductions'),
+  ].join('')),
+  text: `We have introduced you to ${partner} for: ${purpose}.`,
+});

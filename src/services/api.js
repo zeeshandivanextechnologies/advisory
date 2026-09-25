@@ -30,3 +30,4 @@ export const salesAPI         = impl.salesAPI;
 export const teamAPI          = impl.teamAPI;
 export const aiAPI            = impl.aiAPI;
 export const deliverableAPI   = impl.deliverableAPI;
+export const partnerAPI       = impl.partnerAPI;

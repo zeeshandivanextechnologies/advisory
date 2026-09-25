@@ -263,6 +263,25 @@ export const deliverableAPI = {
   download: (id)               => api.get(`/deliverables/${id}/download`, { responseType: 'blob' }),
 };
 
+/* ── Law firm / partner MOU workflow ── */
+export const partnerAPI = {
+  // admin
+  list:           (status)          => api.get('/admin/partners', { params: { status } }),
+  detail:         (id)              => api.get(`/admin/partners/${id}`),
+  create:         (data)            => api.post('/admin/partners', data),
+  update:         (id, data)        => api.put(`/admin/partners/${id}`, data),
+  createMou:      (id, data)        => api.post(`/admin/partners/${id}/mous`, data),
+  updateMou:      (id, mouId, data) => api.put(`/admin/partners/${id}/mous/${mouId}`, data),
+  referrals:      (params)          => api.get('/admin/partner-referrals', { params }),
+  createReferral: (data)            => api.post('/admin/partner-referrals', data),
+  updateReferral: (id, data)        => api.put(`/admin/partner-referrals/${id}`, data),
+  reviews:        (quarter)         => api.get('/admin/partner-reviews', { params: { quarter } }),
+  saveReview:     (id, data)        => api.put(`/admin/partners/${id}/review`, data),
+  // client
+  myReferrals:    ()                => api.get('/referrals'),
+  respond:        (id, consent)     => api.put(`/referrals/${id}/respond`, { consent }),
+};
+
 /* ── Public (no login needed) ──────────────────────────────── */
 export const publicAPI = {
   getSettings: ()     => api.get('/settings'),

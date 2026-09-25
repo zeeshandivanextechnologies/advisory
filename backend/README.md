@@ -43,7 +43,8 @@ backend/
     │   ├── 0006_client_journey_engagements.sql
     │   ├── 0007_sales_rules.sql
     │   ├── 0008_staffing_ai.sql
-    │   └── 0009_deliverable_qa.sql
+    │   ├── 0009_deliverable_qa.sql
+    │   └── 0010_partners.sql
     ├── templates/            auth emails (6-digit signup code, password reset)
     └── seed.sql
 ```
@@ -193,6 +194,24 @@ No deliverable reaches a client without the QA checklist and an approval. The fl
 5. A warning shows when QA finished less than 24 hours before release.
 
 The engagement-level "final delivery" QA gate from migration `0006` still applies.
+
+### Law firm / partner MOU workflow (migration `0010`)
+This is the admin **Partners** page, for full admins only. Limited team logins cannot open it.
+
+1. **Priority partners**: law firms and licensed professionals with Qatar/GCC business-setup experience. The page tracks the target of six priority partners that are active with a signed MOU.
+2. **Partner profile**: specialties, jurisdictions, languages, response time, pricing, referral policy and conflicts.
+3. **MOU before any client is sent**. A MOU can only be marked signed when it covers referral fees, confidentiality, client ownership, service boundaries and a response expectation (in hours). Signing activates the partner. A partner cannot be made active, or receive a referral, without a signed MOU that has not expired. Expired MOUs are closed by the hourly job.
+4. **Referral handoff form**. Every introduction records a purpose (required), what will be shared, and the client's consent:
+   - **In-app consent**: the client is notified and emailed, then consents or declines under *Services → Introductions to Licensed Partners*.
+   - **Consent obtained outside the app** (email, written, verbal): the admin must confirm it and note how it was given.
+
+   An introduction can only be marked as made after consent. A linked service request moves to `referred`. The flow is: introduced → partner responded (response time measured against the MOU) → completed (outcome, client rating, referral fee).
+5. **Quarterly review**. Each quarter shows every partner's referrals, average response time, late responses, client rating and fees. The admin then scores responsiveness, quality, client feedback and reputational risk, and decides:
+   - **keep**
+   - **watch**: pauses new referrals
+   - **remove**: needs a reason; the partner is removed and blocked from referrals
+
+   Admins are notified once when a new quarter's reviews are due.
 
 ### Endpoints (all under `/api`)
 Every response is `{ success, data }` (lists add `meta`) or `{ success:false, message }`. Protected endpoints need `Authorization: Bearer <token>`.

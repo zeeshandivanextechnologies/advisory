@@ -16,6 +16,7 @@ const journey = require('../controllers/journey.controller');
 const team = require('../controllers/team.controller');
 const aiDrafts = require('../controllers/ai.controller');
 const deliverables = require('../controllers/deliverables.controller');
+const partners = require('../controllers/partners.controller');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: env.maxUploadBytes } });
 const router = Router();
@@ -128,6 +129,10 @@ router.post('/deliverables/:id/action', h(deliverables.action));
 router.put('/deliverable-qa/:itemId', h(deliverables.setQa));
 router.get('/deliverables/:id/download', h(deliverables.download));
 
+// Partner referrals: the client consents to each introduction
+router.get('/referrals', h(partners.myReferrals));
+router.put('/referrals/:id/respond', h(partners.respond));
+
 /* ── Staffing & AI drafts ────────────────────────────────── */
 router.get('/team/me', h(team.myScope));
 router.get('/engagements/:id/team', h(team.engagementTeam));
@@ -168,6 +173,19 @@ router.delete('/admin/community/events/:id', h(services.adminDeleteEvent));
 router.post('/admin/community/briefs', h(services.adminCreateBrief));
 router.put('/admin/community/briefs/:id', h(services.adminUpdateBrief));
 router.delete('/admin/community/briefs/:id', h(services.adminDeleteBrief));
+
+// Law firm / partner MOU workflow
+router.get('/admin/partners', h(partners.list));
+router.post('/admin/partners', h(partners.create));
+router.get('/admin/partners/:id', h(partners.detail));
+router.put('/admin/partners/:id', h(partners.update));
+router.post('/admin/partners/:id/mous', h(partners.createMou));
+router.put('/admin/partners/:id/mous/:mouId', h(partners.updateMou));
+router.put('/admin/partners/:id/review', h(partners.saveReview));
+router.get('/admin/partner-referrals', h(partners.referrals));
+router.post('/admin/partner-referrals', h(partners.createReferral));
+router.put('/admin/partner-referrals/:id', h(partners.updateReferral));
+router.get('/admin/partner-reviews', h(partners.reviews));
 router.get('/admin/proposals', h(journey.adminProposals));
 router.post('/admin/proposals', h(journey.adminCreateProposal));
 router.put('/admin/proposals/:id', h(journey.adminUpdateProposal));

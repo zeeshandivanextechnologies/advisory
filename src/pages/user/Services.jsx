@@ -7,6 +7,7 @@ import { serviceAPI } from '../../services/api';
 import { useSettings } from '../../context/SettingsContext';
 import { priceLabel, money, hours, fmtDate, retainerCategoryLabel, OPEN_REQUEST, REQUEST_STATUSES, BUDGET_RANGES, isProjectOffering } from '../../utils/services';
 import { FiClock, FiCalendar, FiDollarSign, FiCheckCircle } from 'react-icons/fi';
+import PartnerIntroductions from '../../components/services/PartnerIntroductions';
 
 const statusText = (s) => REQUEST_STATUSES.find(x => x.value === s)?.label || s;
 
@@ -275,6 +276,9 @@ export default function Services() {
             </table>
           </div>
         </div>
+
+        {/* Introductions to licensed partners (client consent) */}
+        <PartnerIntroductions />
 
         <p style={{ fontSize: 12, color: 'var(--text-dark-4)', marginTop: 16 }}>
           {platformName} provides business, market-entry, regulatory-navigation and relationship-development advisory.

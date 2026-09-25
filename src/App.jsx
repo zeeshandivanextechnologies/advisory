@@ -59,6 +59,7 @@ import AdminRevenue   from './pages/admin/Revenue';
 import AdminSettings  from './pages/admin/Settings';
 import AdminServices  from './pages/admin/Services';
 import AdminCommunity from './pages/admin/Community';
+import AdminPartners from './pages/admin/Partners';
 import AdminEngagements from './pages/admin/Engagements';
 import AdminLeads     from './pages/admin/Leads';
 import AdminTeam      from './pages/admin/Team';
@@ -174,6 +175,7 @@ function AppRoutes() {
         <Route path="settings"      element={<ErrorBoundary><AdminSettings /></ErrorBoundary>} />
         <Route path="services"      element={<ErrorBoundary><AdminServices /></ErrorBoundary>} />
         <Route path="community"     element={<ErrorBoundary><AdminCommunity /></ErrorBoundary>} />
+        <Route path="partners"      element={<ErrorBoundary><AdminPartners /></ErrorBoundary>} />
         <Route path="engagements"   element={<ErrorBoundary><AdminEngagements /></ErrorBoundary>} />
         <Route path="leads"         element={<ErrorBoundary><AdminLeads /></ErrorBoundary>} />
         <Route path="team"          element={<ErrorBoundary><AdminTeam /></ErrorBoundary>} />

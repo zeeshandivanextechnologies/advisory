@@ -65,6 +65,7 @@ export const Badge = ({ status, text, customStyle }) => {
     won:         'badge-green',  declined:    'badge-red',    invited:     'badge-orange',
     paused:      'badge-orange', ended:       'badge-gray',   expired:     'badge-gray',
     nurture:     'badge-orange', referred:    'badge-gray',
+    removed:     'badge-red',
   };
   const cls   = map[status] || 'badge-gray';
   const label = text || status?.replace(/_/g, ' ') || '—';

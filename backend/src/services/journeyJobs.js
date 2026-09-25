@@ -19,6 +19,9 @@ const runOnce = async () => {
   // Sales rules: expired proposals → nurture, and close nurture periods that ended
   const { rows: [sales] } = await pool.query('select public._run_sales_jobs() as r');
   r.sales = sales.r;
+  // Partners: expire MOUs past their end date, and the quarterly review reminder
+  const { rows: [partners] } = await pool.query('select public._run_partner_jobs() as r');
+  r.partners = partners.r;
 
   for (const i of r.invoice_reminders || []) {
     sendMailSafe({ to: i.email, ...mail.invoiceReminder({

@@ -385,6 +385,23 @@ export const deliverableAPI = {
   },
 };
 
+/* ── Law firm / partner MOU workflow ── */
+export const partnerAPI = {
+  list:           (status)          => rpc('api_admin_partners', { p: { status: status || '' } }).then(okList),
+  detail:         (id)              => rpc('api_admin_partner_detail', { p_id: Number(id) }).then(ok),
+  create:         (data)            => rpc('api_admin_save_partner', { p_id: null, p: data }).then(ok),
+  update:         (id, data)        => rpc('api_admin_save_partner', { p_id: Number(id), p: data }).then(ok),
+  createMou:      (id, data)        => rpc('api_admin_save_mou', { p_partner_id: Number(id), p_id: null, p: data }).then(ok),
+  updateMou:      (id, mouId, data) => rpc('api_admin_save_mou', { p_partner_id: Number(id), p_id: Number(mouId), p: data }).then(ok),
+  referrals:      (params = {})     => rpc('api_admin_referrals', { p: { status: params.status || '', partner_id: params.partner_id || '' } }).then(ok),
+  createReferral: (data)            => rpc('api_admin_create_referral', { p: data }).then(ok),
+  updateReferral: (id, data)        => rpc('api_admin_update_referral', { p_id: Number(id), p: data }).then(ok),
+  reviews:        (quarter)         => rpc('api_admin_partner_reviews', { p_quarter: quarter || null }).then(ok),
+  saveReview:     (id, data)        => rpc('api_admin_save_partner_review', { p_partner_id: Number(id), p: data }).then(ok),
+  myReferrals:    ()                => rpc('api_my_referrals').then(ok),
+  respond:        (id, consent)     => rpc('api_respond_referral', { p_id: Number(id), p_consent: !!consent }).then(ok),
+};
+
 /* ── Public (no login needed) ──────────────────────────────── */
 export const publicAPI = {
   getSettings: ()     => rpc('api_public_settings').then(ok),

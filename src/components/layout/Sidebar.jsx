@@ -14,6 +14,7 @@ import { FiSettings } from "react-icons/fi";
 import { FiLayers, FiGlobe, FiClock } from "react-icons/fi";
 import { FiClipboard, FiInbox } from "react-icons/fi";
 import { FiUserCheck } from "react-icons/fi";
+import { FaBalanceScale } from "react-icons/fa";
 import { SCOPE_PAGES } from '../../utils/team';
 
 
@@ -50,6 +51,7 @@ const ICONS = {
   engagements: <FiClipboard />,
   leads:     <FiInbox />,
   team:      <FiUserCheck />,
+  partners:  <FaBalanceScale />,
 };
 
 const navItems = {
@@ -92,6 +94,7 @@ const navItems = {
       { to: '/admin/services',   icon: 'services',  text: 'Services' },
       { to: '/admin/engagements', icon: 'engagements', text: 'Engagements' },
       { to: '/admin/community',  icon: 'community', text: 'Community' },
+      { to: '/admin/partners',   icon: 'partners',  text: 'Partners' },
       { to: '/admin/documents',  icon: 'docs',      text: 'Documents' },
       { to: '/admin/revenue',    icon: 'revenue',   text: 'Revenue' },
       { to: '/admin/team',       icon: 'team',      text: 'Team' },
