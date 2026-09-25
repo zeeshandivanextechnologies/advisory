@@ -74,6 +74,7 @@ export default function Documents() {
     const fd = new FormData();
     fd.append('file', file);
     fd.append('category', docType.toLowerCase().replace(/\s+/g, '_').replace(/[()]/g, ''));
+    fd.append('jurisdiction', jurisdiction);
     try {
       await documentAPI.upload(fd);
       showToast('Document uploaded successfully');

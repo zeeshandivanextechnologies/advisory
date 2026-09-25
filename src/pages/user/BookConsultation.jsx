@@ -131,6 +131,7 @@ export default function BookConsultation() {
         medium:       selectedSessionType.medium,
         user_notes:   form.session_brief,
         case_id:      form.related_case || undefined,
+        document_id:  form.document_id || undefined,
       });
 
       showToast('Consultation booked! Check your email for confirmation.');

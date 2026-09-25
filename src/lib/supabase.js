@@ -4,8 +4,8 @@ const url = process.env.REACT_APP_SUPABASE_URL;
 const key = process.env.REACT_APP_SUPABASE_PUBLISHABLE_KEY;
 
 if (!url || !key) {
-  // eslint-disable-next-line no-console
-  console.error('Missing REACT_APP_SUPABASE_URL / REACT_APP_SUPABASE_PUBLISHABLE_KEY in .env');
+  // CRA only reads .env at startup — restart `npm start` after editing it
+  throw new Error('Missing REACT_APP_SUPABASE_URL / REACT_APP_SUPABASE_PUBLISHABLE_KEY. Check .env and restart the dev server.');
 }
 
 export const supabase = createClient(url, key, {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { intakeAPI } from '../../services/api';
 import { FaBuilding, FaFileAlt, FaPassport, FaMoneyBillWave, FaCheckCircle, FaTrademark, FaBalanceScale, FaHandshake, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 const NEEDS = [
@@ -80,7 +81,11 @@ export default function Needs() {
             </button>
             <button
               className="ai-thm-btn"
-              onClick={() => navigate('/onboarding/connect')}
+              onClick={() => {
+                // Save in the background; onboarding must never block on it
+                intakeAPI.save({ needs: selected }).catch(() => {});
+                navigate('/onboarding/connect');
+              }}
               disabled={!selected.length}
               style={{ opacity: !selected.length ? 0.5 : 1, cursor: !selected.length ? 'not-allowed' : 'pointer' }}
             >

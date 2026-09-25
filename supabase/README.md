@@ -1,6 +1,6 @@
 # Supabase backend
 
-The app has no server of its own. Supabase provides Auth, Postgres and Storage. All business logic runs in the `api_*` Postgres functions in `migrations/0001_init.sql`, and the frontend calls them through `src/services/api.js`.
+The app has no server of its own. Supabase provides Auth, Postgres and Storage. All business logic runs in the `api_*` Postgres functions in `migrations/` (apply the files in order), and the frontend calls them through `src/services/api.js`.
 
 - Tables have RLS enabled and no client grants, so the browser can only use the RPC functions.
 - Uploaded files go to the private `documents` storage bucket, under `<user-id>/...`.

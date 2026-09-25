@@ -160,6 +160,7 @@ export const documentAPI = {
           file_type: file.type || 'application/octet-stream',
           file_size: file.size,
           category: fd.get('category') || 'other',
+          jurisdiction: fd.get('jurisdiction') || null,
           case_id: fd.get('case_id') || null,
         },
       }));
@@ -186,6 +187,22 @@ export const documentAPI = {
   },
 };
 
+/* ── Case workspace: milestones, kickoff checklist, status updates ── */
+export const caseWorkspaceAPI = {
+  getDetail:           (caseId)             => rpc('api_case_detail', { p_id: Number(caseId) }).then(ok),
+  saveMilestone:       (caseId, id, data)   => rpc('api_save_milestone', { p_case_id: Number(caseId), p_id: id ? Number(id) : null, p: data }).then(ok),
+  deleteMilestone:     (id)                 => rpc('api_delete_milestone', { p_id: Number(id) }).then(ok),
+  saveChecklistItem:   (caseId, id, data)   => rpc('api_save_checklist_item', { p_case_id: Number(caseId), p_id: id ? Number(id) : null, p: data }).then(ok),
+  deleteChecklistItem: (id)                 => rpc('api_delete_checklist_item', { p_id: Number(id) }).then(ok),
+  addUpdate:           (caseId, data)       => rpc('api_add_case_update', { p_case_id: Number(caseId), p: data }).then(ok),
+};
+
+/* ── Pre-call intake (onboarding needs + discovery questions) ── */
+export const intakeAPI = {
+  save: (data)          => rpc('api_save_intake', { p: data }).then(ok),
+  get:  (userId = null) => rpc('api_get_intake', { p_user_id: userId }).then(ok),
+};
+
 /* ── Notifications ─────────────────────────────────────────── */
 export const notifAPI = {
   list:     (p = {})    => rpc('api_notifications', { p }).then(okList),
@@ -202,6 +219,8 @@ export const adminAPI = {
   getRevenue:          ()         => rpc('api_admin_revenue').then(ok),
   getSettings:         ()         => rpc('api_admin_settings').then(ok),
   updateSettings:      (data)     => rpc('api_admin_update_settings', { p: data }).then(ok),
+  getLeads:            (p = {})   => rpc('api_admin_leads', { p }).then(okList),
+  updateLead:          (id, data) => rpc('api_admin_update_lead', { p_id: Number(id), p: data }).then(ok),
 };
 
 /* ── Subscriptions & payments ──────────────────────────────── */
