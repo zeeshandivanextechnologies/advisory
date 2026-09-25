@@ -98,7 +98,7 @@ export default function UserDashboard() {
           <div className='table-responsive'>
             <div className="table-header">
               <span className="table-title fz-14">Recent Documents</span>
-              <button className="btn btn-outline-dark btn-sm" onClick={() => navigate('/user/documents')}>View All</button>
+              <button className="ai-thm-btn outline" onClick={() => navigate('/user/documents')}>View All</button>
             </div>
             <table className="table billing-table align-middle mb-0 ai-case-table">
               <thead><tr><th>Document</th><th>Category</th><th>Status</th></tr></thead>

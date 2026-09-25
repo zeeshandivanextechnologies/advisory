@@ -1,3 +1,4 @@
+import { FiCalendar, FiFileText } from 'react-icons/fi';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
@@ -34,7 +35,7 @@ export function MarketBriefs({ briefs }) {
             ))}
           </div>
         ) : (
-          <EmptyState icon="📰" title="No briefs yet" text="New monthly market briefs will appear here" />
+          <EmptyState icon={<FiFileText />} title="No briefs yet" text="New monthly market briefs will appear here" />
         )}
       </div>
 
@@ -140,7 +141,7 @@ export default function Community() {
         ))}
 
         {!current.length && !invites.length && user?.role === 'user' && (
-          <div className="advisor-legal-cards mb-3" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div className="advisor-legal-cards mb-3 h-auto" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <div>
               <h3 style={{ fontSize: 16, fontFamily: 'var(--font-h)', fontWeight: 600, color: '#000', marginBottom: 2 }}>Integra Innovators</h3>
               <p style={{ fontSize: 13, color: '#4A4949', marginBottom: 0 }}>Membership is invite-only. Request to join and our team will be in touch.</p>
@@ -192,7 +193,7 @@ export default function Community() {
               </div>
             );
           }) : (
-            <div className="advisor-legal-cards"><EmptyState icon="📅" title="No upcoming events" text="Integra Nights, webinars and demos will appear here" /></div>
+            <div className="advisor-legal-cards"><EmptyState icon={<FiCalendar />} title="No upcoming events" text="Integra Nights, webinars and demos will appear here" /></div>
           )}
         </div>
 

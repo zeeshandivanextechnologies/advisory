@@ -98,13 +98,13 @@ export default function Notifications() {
         </div>
 
         <div style={{ background: 'white', border: '1px solid var(--border-light)', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
-          <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '16px', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h5 style={{ fontSize: 18, fontFamily: 'var(--font-h)', fontWeight: 600, color: 'var(--text-dark)', marginBottom: 3 }}>
+              <h5 className='mb-0' style={{ fontSize: 18, fontFamily: 'var(--font-h)', fontWeight: 600, color: 'var(--text-dark)', marginBottom: 3 }}>
                 Notifications
               </h5>
               {unread > 0 && (
-                <p style={{ fontSize: 13, color: 'var(--text-dark-4)' }}>{unread} unread</p>
+                <p className='mb-0' style={{ fontSize: 13, color: 'var(--text-dark-4)', lineHeight : 'normal' }}>{unread} unread</p>
               )}
             </div>
             {unread > 0 && (

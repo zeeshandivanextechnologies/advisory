@@ -145,7 +145,7 @@ function PartnersTab() {
 
   return (
     <>
-      <div className="advisor-legal-cards mb-3" style={{ padding: 14 }}>
+      <div className="advisor-legal-cards mb-3 h-auto" style={{ padding: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: 14, fontWeight: 600, color: '#000' }}><FiStar style={{ verticalAlign: '-2px', color: 'var(--orange)' }} /> Priority partners: {meta.priority_active ?? 0} of {meta.priority_target ?? 6} active with a signed MOU</div>
