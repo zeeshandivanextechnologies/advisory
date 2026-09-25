@@ -48,6 +48,15 @@ const BUSINESS_ACTIVITIES = ['IT Consultant', 'Legal Services', 'Trading', 'Manu
 const NATIONALITIES       = ['Qatari', 'Saudi', 'UAE', 'Indian', 'Pakistani', 'British', 'American', 'Other'];
 const AREAS               = ['West Bay, Doha', 'The Pearl', 'Al Sadd', 'Al Dafna', 'Al Muntazah', 'Lusail City', 'Al Wakrah'];
 const STEPS               = ['Select Type', 'Jurisdiction', 'Details', 'Review'];
+const STEP_SUBTITLES      = [
+  'Select the category that best describes your matter.',
+  'Choose where you want to establish your business.',
+  'Tell us about the company and its shareholders.',
+  'Check everything before you submit your case.',
+];
+
+// "200,000" → 200000; NaN when not a number
+const parseAmount = (v) => Number(String(v ?? '').replace(/[,\s]/g, ''));
 
 const emptyShareholder = () => ({
   full_name: '', nationality: 'Qatari', qatar_id: '',
@@ -93,19 +102,33 @@ export default function StartBusiness() {
     }
     if (currentStep === 3) {
       if (!form.company_name?.trim()) { showToast('Company name is required', 'error'); return false; }
+      const capital = parseAmount(form.share_capital);
+      if (String(form.share_capital).trim() && (!Number.isFinite(capital) || capital <= 0)) {
+        showToast('Share capital must be a positive amount', 'error'); return false;
+      }
       const invalidShareholder = form.shareholders.find(s => !s.full_name?.trim());
       if (invalidShareholder) { showToast('All shareholders must have a name', 'error'); return false; }
+      const badShare = form.shareholders.find(s => {
+        const v = parseFloat(s.shareholding);
+        return !Number.isFinite(v) || v <= 0 || v > 100;
+      });
+      if (badShare) { showToast(`Enter a shareholding between 0 and 100% for ${badShare.full_name || 'each shareholder'}`, 'error'); return false; }
       const totalShares = form.shareholders.reduce((sum, s) => sum + (parseFloat(s.shareholding) || 0), 0);
-      if (form.shareholders.length > 0 && totalShares > 0 && Math.abs(totalShares - 100) > 0.1) {
-        showToast(`Shareholding must total 100%. Currently: ${totalShares}%`, 'error');
+      if (Math.abs(totalShares - 100) > 0.1) {
+        showToast(`Shareholding must total 100%. Currently: ${Number(totalShares.toFixed(2))}%`, 'error');
         return false;
       }
     }
     return true;
   };
 
+  const goToStep = (n) => {
+    setStep(n);
+    document.querySelector('.main-content')?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const goNext = () => {
-    if (validateStep(step)) setStep(s => s + 1);
+    if (validateStep(step)) goToStep(step + 1);
   };
 
   const handleSubmit = async () => {
@@ -128,9 +151,10 @@ export default function StartBusiness() {
         }),
         priority: 'medium',
       };
-      await caseAPI.create(payload);
-      showToast('Case submitted successfully!');
-      navigate('/user/documents');
+      const res = await caseAPI.create(payload);
+      const caseNo = res.data?.data?.case_number;
+      showToast(`Case ${caseNo ? `${caseNo} ` : ''}submitted! Upload your documents next.`);
+      navigate('/user/dashboard');
     } catch (err) {
       showToast(err.response?.data?.message || 'Failed to submit case', 'error');
     } finally {
@@ -171,8 +195,8 @@ export default function StartBusiness() {
       <div className="main-content flex-grow-1 p-3 overflow-auto">
          <div className='row mb-3'>
      <div className='col-lg-12'>
-       <h4 style={{ fontSize: 24, fontFamily: 'var(--font-h)', fontWeight: 600, color: '#000', marginBottom: 0 }}>Select Type</h4>
-        <p style={{ fontSize: 14, fontWeight: 400, color: '#4A4949', marginBottom: 0 }}>Select the category that best describes your legal matter.</p>
+       <h4 style={{ fontSize: 24, fontFamily: 'var(--font-h)', fontWeight: 600, color: '#000', marginBottom: 0 }}>{STEPS[step - 1]}</h4>
+        <p style={{ fontSize: 14, fontWeight: 400, color: '#4A4949', marginBottom: 0 }}>{STEP_SUBTITLES[step - 1]}</p>
      </div>
     </div>
 
@@ -298,7 +322,7 @@ export default function StartBusiness() {
                 </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
-                <button className="ai-thm-btn outline" onClick={() => setStep(1)}><FaArrowLeft />  Back</button>
+                <button className="ai-thm-btn outline" onClick={() => goToStep(1)}><FaArrowLeft />  Back</button>
                 <button className="ai-thm-btn" onClick={goNext}>Continue <FaArrowRight /></button>
               </div>
             </div>
@@ -309,7 +333,7 @@ export default function StartBusiness() {
         {step === 3 && (
           <div className='case-step-box'>
             <h2 style={{ fontSize: 18, fontWeight: 500, fontFamily: 'var(--font-h)', marginBottom: 0, color : "#000000" }}>Client  Details</h2>
-            <p style={{ fontSize: 14, color: '#4A4949', marginBottom: 10 }}>Select the category that best describes your legal need. AI will load the right workflow and checklists for Qatar law.</p>
+            <p style={{ fontSize: 14, color: '#4A4949', marginBottom: 10 }}>Fields marked * are required. Shareholdings must add up to 100%.</p>
 
             <h5 style={{ fontSize: 16, fontWeight: 500, fontFamily: 'var(--font-h)', marginBottom: 15, color : "#000000" }}>Company Information</h5>
 
@@ -351,7 +375,7 @@ export default function StartBusiness() {
                 <div className='Shareholder-form-box'>
                   <div className="form-group"><label className="form-label">Full Name *</label><input className="form-input" value={s.full_name} onChange={e => setShareholder(idx, 'full_name', e.target.value)} /></div>
                   <div className="form-group"><label className="form-label">Nationality</label><select className="form-select" value={s.nationality} onChange={e => setShareholder(idx, 'nationality', e.target.value)}>{NATIONALITIES.map(n => <option key={n}>{n}</option>)}</select></div>
-                  <div className="form-group"><label className="form-label">Shareholding %</label><input className="form-input" type="number" min="0" max="100" value={s.shareholding} onChange={e => setShareholder(idx, 'shareholding', e.target.value)} /></div>
+                  <div className="form-group"><label className="form-label">Shareholding % *</label><input className="form-input" type="number" min="0" max="100" value={s.shareholding} onChange={e => setShareholder(idx, 'shareholding', e.target.value)} /></div>
                 </div>
               </div>
             ))}
@@ -363,7 +387,7 @@ export default function StartBusiness() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
-              <button className="ai-thm-btn outline" onClick={() => setStep(2)}><FaArrowLeft /> Back</button>
+              <button className="ai-thm-btn outline" onClick={() => goToStep(2)}><FaArrowLeft /> Back</button>
               <button className="ai-thm-btn" onClick={goNext}>Review <FaArrowRight /></button>
             </div>
           </div>
@@ -379,8 +403,10 @@ export default function StartBusiness() {
                 ['Jurisdiction',  JURISDICTIONS.find(j => j.value === form.jurisdiction)?.label],
                 ['Company Name',  form.company_name],
                 ['Entity Type',   form.entity_type],
-                ['Share Capital', `${currency} ${form.share_capital}`],
-                ['Shareholders',  form.shareholders.map(s => s.full_name).filter(Boolean).join(', ')],
+                ['Share Capital', form.share_capital ? `${currency} ${form.share_capital}` : ''],
+                ['Business Activity', form.business_activity],
+                ['Shareholders',  form.shareholders.filter(s => s.full_name).map(s => `${s.full_name} (${s.nationality}, ${s.shareholding || 0}%)`).join(', ')],
+                ['Additional Notes', form.description],
               ].map(([label, value]) => (
                 <div key={label} style={{ display: 'flex', justifyContent : "space-between", padding: '10px 0', borderBottom: '1px solid var(--border-light)' }}>
                   <span style={{ fontSize: 14, fontWeight: 600, color: '#000' }}>{label}</span>
@@ -389,7 +415,7 @@ export default function StartBusiness() {
               ))}
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <button className="ai-thm-btn outline" onClick={() => setStep(3)}> <FaArrowLeft /> Back</button>
+              <button className="ai-thm-btn outline" onClick={() => goToStep(3)}> <FaArrowLeft /> Back</button>
               {/* FIX: Button label matches the actual action */}
               <button className="ai-thm-btn" onClick={handleSubmit} disabled={loading}>
                 {loading ? 'Submitting…' : 'Submit Case'}
