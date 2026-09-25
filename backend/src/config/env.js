@@ -19,4 +19,16 @@ module.exports = {
   // Server-side only. Needed for file storage and password changes.
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   maxUploadBytes: Number(process.env.MAX_UPLOAD_MB || 20) * 1024 * 1024,
+
+  appName: process.env.APP_NAME || 'AunAdvisory',
+  // Receives contact-form inquiries; empty = don't forward
+  adminEmail: process.env.ADMIN_EMAIL || '',
+  smtp: {
+    host: process.env.SMTP_HOST || '',
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true', // true for port 465
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+    from: process.env.MAIL_FROM || `"${process.env.APP_NAME || 'AunAdvisory'}" <${process.env.SMTP_USER || 'no-reply@localhost'}>`,
+  },
 };

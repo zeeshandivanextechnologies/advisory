@@ -45,9 +45,10 @@ export const authAPI = {
   getMe:          ()     => api.get('/auth/me'),
   changePassword: (data) => api.put('/auth/change-password', data),
 
-  // The emailed reset link signs the browser into Supabase with a recovery
-  // session; the server verifies that token and sets the new password.
-  resetPassword: async ({ password }) => {
+  // `token` comes from the emailed link (?token=…). Older links sent by Supabase
+  // sign the browser in instead, so fall back to that session's access token.
+  resetPassword: async ({ token, password }) => {
+    if (token) return api.post('/auth/reset-password', { token, password });
     const { data: { session } } = await supabase.auth.getSession();
     const res = await api.post('/auth/reset-password', { token: session?.access_token, password });
     await supabase.auth.signOut();

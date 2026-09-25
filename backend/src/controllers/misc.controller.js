@@ -1,5 +1,8 @@
 const { rpc } = require('../config/db');
 const { send, sendList } = require('../utils/http');
+const env = require('../config/env');
+const { sendMailSafe } = require('../services/mailer');
+const tpl = require('../services/emailTemplates');
 
 /* ── Notifications ── */
 exports.listNotifications = async (req, res) =>
@@ -22,7 +25,23 @@ exports.plans = async (req, res) => send(res, await rpc('api_plans'));
 
 exports.mySubscription = async (req, res) => send(res, await rpc('api_my_subscription', {}, req.userId));
 
-exports.purchase = async (req, res) => send(res, await rpc('api_purchase_plan', { p: req.body }, req.userId), 201);
+exports.purchase = async (req, res) => {
+  const result = await rpc('api_purchase_plan', { p: req.body }, req.userId);
+  send(res, result, 201);
+
+  const pay = result.payment;
+  if (pay) {
+    rpc('api_me', {}, req.userId)
+      .then((me) => rpc('api_my_subscription', {}, req.userId).then((sub) => sendMailSafe({
+        to: me.email,
+        ...tpl.paymentReceipt({
+          name: me.full_name, planName: sub?.plan_name || me.plan, amount: pay.amount,
+          currency: pay.currency, invoiceNo: pay.invoice_no, expiresAt: sub?.expires_at,
+        }),
+      })))
+      .catch((err) => console.error('[mail] receipt failed:', err.message));
+  }
+};
 
 exports.payments = async (req, res) => send(res, await rpc('api_payments', {}, req.userId));
 
@@ -40,4 +59,11 @@ exports.adminDeletePlan = async (req, res) =>
 /* ── Public ── */
 exports.publicSettings = async (req, res) => send(res, await rpc('api_public_settings'));
 
-exports.contact = async (req, res) => send(res, await rpc('api_contact', { p: req.body }), 201);
+exports.contact = async (req, res) => {
+  await rpc('api_contact', { p: req.body });
+  send(res, null, 201);
+
+  const { name, email, company, subject, message } = req.body;
+  sendMailSafe({ to: email, ...tpl.contactAck({ name }) });
+  if (env.adminEmail) sendMailSafe({ to: env.adminEmail, ...tpl.contactAdmin({ name, email, company, subject, message }) });
+};

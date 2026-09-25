@@ -7,15 +7,18 @@ import { MdCheckBox } from 'react-icons/md';
 
 export default function NewPassword() {
   const navigate  = useNavigate();
-  // The emailed reset link signs the user in with a recovery session
-  const [token, setToken] = useState(null);
+  // Reset links from the Express API carry ?token=…; links sent by Supabase
+  // instead sign the browser in with a recovery session.
+  const urlToken = new URLSearchParams(window.location.search).get('token') || '';
+  const [token, setToken] = useState(urlToken || null);
   useEffect(() => {
+    if (urlToken) return undefined;
     supabase.auth.getSession().then(({ data: { session } }) => setToken(session ? 'session' : ''));
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) setToken('session');
     });
     return () => subscription.unsubscribe();
-  }, []);
+  }, [urlToken]);
 
   const [form, setForm] = useState({
     password: '', confirm: '',
@@ -55,7 +58,7 @@ export default function NewPassword() {
     setError('');
     setLoading(true);
     try {
-      await authAPI.resetPassword({ password: form.password });
+      await authAPI.resetPassword({ token: urlToken, password: form.password });
       setSuccess(true);
       setTimeout(() => navigate('/auth/login'), 2500);
     } catch (err) {

@@ -1,6 +1,7 @@
 const env = require('./config/env');
 const app = require('./app');
 const { pool } = require('./config/db');
+const mailer = require('./services/mailer');
 
 const server = app.listen(env.port, async () => {
   console.log(`AunAdvisory API listening on http://localhost:${env.port}/api`);
@@ -9,6 +10,13 @@ const server = app.listen(env.port, async () => {
     console.log('Database connected');
   } catch (err) {
     console.error('Database connection failed:', err.message);
+  }
+  if (mailer.isConfigured()) {
+    mailer.verify()
+      .then(() => console.log(`SMTP ready (${env.smtp.host})`))
+      .catch((err) => console.error(`SMTP connection failed (${env.smtp.host}):`, err.message));
+  } else {
+    console.warn('SMTP not configured: emails (OTP codes, reset links) will be printed here in the console');
   }
   if (!env.supabaseServiceRoleKey) {
     console.warn('SUPABASE_SERVICE_ROLE_KEY not set: document upload/download and password changes will fail');
