@@ -7,6 +7,13 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 app.disable('x-powered-by');
+// API responses are per-user and change often: no ETags (which made browsers
+// revalidate and get 304 Not Modified) and no caching anywhere.
+app.set('etag', false);
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 app.use(cors({
   origin: (origin, cb) => cb(null, !origin || env.corsOrigins.includes(origin.replace(/\/$/, ''))),
 }));
