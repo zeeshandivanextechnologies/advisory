@@ -1,0 +1,2 @@
+-- Seed data (platform settings and default plans) is created by the
+-- migrations, so nothing extra is needed here. Add local-only test data below.

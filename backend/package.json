@@ -1,0 +1,19 @@
+{
+  "name": "aunadvisory-backend",
+  "version": "1.0.0",
+  "description": "AunAdvisory serverless backend (Supabase: Postgres, Auth, Storage)",
+  "scripts": {
+    "start": "supabase start",
+    "stop": "supabase stop",
+    "status": "supabase status",
+    "reset": "supabase db reset",
+    "new-migration": "supabase migration new",
+    "link": "supabase link --project-ref dtiyvsaugifxgvekuiuv",
+    "migrations:remote": "supabase migration list --linked",
+    "push": "supabase db push --linked"
+  },
+  "devDependencies": {
+    "supabase": "^2.117.0"
+  },
+  "private": true
+}
