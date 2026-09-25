@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
 import { showToast } from '../../components/common/index';
-import { advisorAPI, userAPI, caseAPI, documentAPI } from '../../services/api';
+import { advisorAPI, userAPI, caseAPI, documentAPI, salesAPI } from '../../services/api';
 import { useSettings } from '../../context/SettingsContext';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 
@@ -115,6 +115,11 @@ export default function BookConsultation() {
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
+  // Sales rules: one free discovery call, max meetings before a proposal
+  const [sales, setSales] = useState(null);
+  useEffect(() => { salesAPI.getMyStatus().then(r => setSales(r.data.data)).catch(() => {}); }, []);
+  const salesBlocked = sales && sales.can_book === false;
+
   useEffect(() => {
     advisorAPI.list({ limit: 100 }).then(r => setAdvisors(r.data.data || [])).catch(console.error);
     caseAPI.list({ limit: 50 })
@@ -150,6 +155,7 @@ export default function BookConsultation() {
     if (!form.advisor_id) return showToast('Please select an advisor', 'error');
     if (!selectedDate || !selectedTime) return showToast('Please select a date and time', 'error');
     if (advisorUnavailable) return showToast('This advisor is not accepting bookings right now', 'error');
+    if (salesBlocked) return showToast(sales.message, 'error');
     const dt = slotDate(selectedDate, selectedTime);
     if (dt <= new Date()) {
       setSelectedTime('');
@@ -201,6 +207,19 @@ export default function BookConsultation() {
             <h3 style={{ fontSize: 14, fontFamily: 'var(--font-h)', fontWeight: 700, color: 'var(--text-dark)', marginBottom: 18 }}>
               Session Details
             </h3>
+
+            {salesBlocked ? (
+              <div style={{ background: '#F59E0B1F', border: '0.9px solid #F59E0B', borderRadius: 'var(--radius)', padding: 16, marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                <p style={{ fontSize: 13, color: '#92400E', marginBottom: 0 }}>{sales.message}</p>
+                <button className="ai-thm-btn" onClick={() => navigate('/user/services', { state: { category: 'decision' } })}>View Services</button>
+              </div>
+            ) : sales?.free_calls_left > 0 && (
+              <div style={{ background: '#22C55E1F', border: '0.9px solid #22C55E', borderRadius: 'var(--radius)', padding: '12px 16px', marginBottom: 16 }}>
+                <p style={{ fontSize: 13, color: '#166534', marginBottom: 0 }}>
+                  This is your complimentary discovery call ({sales.free_calls_left} of {sales.free_calls_limit} left). Further sessions follow a paid pathway.
+                </p>
+              </div>
+            )}
 
             <div className='consultation-book-form'>
               <div className="form-group">
@@ -299,7 +318,7 @@ export default function BookConsultation() {
               className="ai-thm-btn"
               style={{ width: '100%', marginTop: 20 }}
               onClick={handleBook}
-              disabled={loading || !selectedDate || !selectedTime || !form.advisor_id || advisorUnavailable}
+              disabled={loading || !selectedDate || !selectedTime || !form.advisor_id || advisorUnavailable || salesBlocked}
             >
               {loading ? 'Booking…' : 'Confirm & Book'}
             </button>

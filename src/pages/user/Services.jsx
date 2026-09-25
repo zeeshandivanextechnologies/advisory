@@ -5,7 +5,7 @@ import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, StatCard, EmptyState, Modal, ConfirmModal, showToast } from '../../components/common/index';
 import { serviceAPI } from '../../services/api';
 import { useSettings } from '../../context/SettingsContext';
-import { priceLabel, money, hours, fmtDate, retainerCategoryLabel, OPEN_REQUEST, REQUEST_STATUSES } from '../../utils/services';
+import { priceLabel, money, hours, fmtDate, retainerCategoryLabel, OPEN_REQUEST, REQUEST_STATUSES, BUDGET_RANGES, isProjectOffering } from '../../utils/services';
 import { FiClock, FiCalendar, FiDollarSign, FiCheckCircle } from 'react-icons/fi';
 
 const statusText = (s) => REQUEST_STATUSES.find(x => x.value === s)?.label || s;
@@ -99,7 +99,7 @@ export default function Services() {
   const [category, setCategory]   = useState(location.state?.category || 'all');
   const [detail, setDetail]       = useState(null);
   const [requestFor, setRequestFor] = useState(null);
-  const [form, setForm]           = useState({ message: '', budget: '' });
+  const [form, setForm]           = useState({ message: '', budget: '', documents_committed: false });
   const [sending, setSending]     = useState(false);
   const [cancelId, setCancelId]   = useState(null);
 
@@ -119,12 +119,16 @@ export default function Services() {
   const openRequestFor = (id) => requests.find(r => r.offering_id === id && OPEN_REQUEST.includes(r.status));
   const activeRetainer = retainers.find(r => r.status !== 'ended');
 
-  const startRequest = (o) => { setForm({ message: '', budget: '' }); setDetail(null); setRequestFor(o); };
+  const startRequest = (o) => { setForm({ message: '', budget: '', documents_committed: false }); setDetail(null); setRequestFor(o); };
+  const budgetMin = BUDGET_RANGES.find(b => b.label === form.budget)?.min;
 
   const sendRequest = async () => {
     setSending(true);
     try {
-      await serviceAPI.requestService({ offering_id: requestFor.id, ...form });
+      await serviceAPI.requestService({
+        offering_id: requestFor.id, message: form.message, budget: form.budget,
+        budget_min: budgetMin ?? '', documents_committed: form.documents_committed,
+      });
       showToast('Request sent — we will reply within 4–6 working hours');
       setRequestFor(null);
       load();
@@ -343,15 +347,21 @@ export default function Services() {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Budget (optional)</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="e.g. $5,000 – $10,000"
-                value={form.budget}
-                onChange={e => setForm(p => ({ ...p, budget: e.target.value }))}
-              />
+              <label className="form-label">Project budget</label>
+              <select className="form-select" value={form.budget} onChange={e => setForm(p => ({ ...p, budget: e.target.value }))}>
+                <option value="">Select a range</option>
+                {BUDGET_RANGES.map(b => <option key={b.label} value={b.label}>{b.label}</option>)}
+              </select>
             </div>
+            <label style={{ fontSize: 13, color: '#4A4949', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              <input type="checkbox" checked={form.documents_committed} onChange={e => setForm(p => ({ ...p, documents_committed: e.target.checked }))} />
+              I can provide the documents this work needs (company registration, IDs, financials).
+            </label>
+            {isProjectOffering(requestFor) && budgetMin !== undefined && budgetMin !== null && budgetMin < 5000 && (
+              <p style={{ fontSize: 12, color: '#92400E', background: '#F59E0B1F', borderRadius: 6, padding: '8px 10px', marginBottom: 0 }}>
+                Projects usually start from $5,000. If you need clarity first, Executive Discovery Sessions may be a better starting point.
+              </p>
+            )}
             {requestFor.out_of_scope?.length > 0 && (
               <p style={{ fontSize: 12, color: 'var(--text-dark-4)', marginBottom: 0 }}>
                 Not included: {requestFor.out_of_scope.join(', ')}.

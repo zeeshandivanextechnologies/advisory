@@ -277,7 +277,15 @@ export const serviceAPI = {
   adminSaveOffering:  (id, data) => rpc('api_admin_save_offering', { p_id: optId(id), p: data }).then(ok),
   adminGetRequests:   (p = {})   => rpc('api_admin_service_requests', { p }).then(okList),
   adminUpdateRequest: (id, data) => rpc('api_admin_update_service_request', { p_id: Number(id), p: data }).then(ok),
+  adminRequestAction: (id, data) => rpc('api_admin_request_action', { p_id: Number(id), p: data }).then(ok),
   adminSaveRetainer:  (id, data) => rpc('api_admin_save_retainer', { p_id: optId(id), p: data }).then(ok),
+};
+
+/* ── Sales rules: meeting limits, prospect profile ──────────── */
+export const salesAPI = {
+  getMyStatus:      ()             => rpc('api_my_sales_status').then(ok),
+  adminGetProfile:  (userId)       => rpc('api_admin_sales_profile', { p_user_id: userId }).then(ok),
+  adminSetProspect: (userId, data) => rpc('api_admin_set_prospect', { p_user_id: userId, p: data }).then(ok),
 };
 
 /* ── Community: memberships, events, market briefs ─────────── */

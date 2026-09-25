@@ -72,6 +72,7 @@ export default function AdminSettings() {
     { id: 'payment', label: 'Payment Gateway' },
     { id: 'plans',   label: 'Subscription Plans' },
     { id: 'access',  label: 'Access Control' },
+    { id: 'sales',   label: 'Sales Rules' },
   ];
 
   // const TabBtn = ({ id, label }) => (
@@ -330,6 +331,58 @@ export default function AdminSettings() {
         )}
 
         {/* ACCESS CONTROL */}
+        {/* SALES RULES */}
+        {activeTab === 'sales' && (
+          <div className='advisor-admin-general-tab'>
+            <div className="advisor-legal-cards">
+              <h3 style={{ fontSize: 16, fontFamily: 'var(--font-h)', fontWeight: 600, marginBottom: 10, color : "#000" }}>Meeting Limits</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-light)', marginBottom: 12 }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color : "#000" }}>Enforce sales rules</div>
+                  <div style={{ fontSize: 12, fontWeight: 400, color: '#4A4949', marginTop: 2 }}>Block bookings that exceed the limits below</div>
+                </div>
+                <label className="toggle">
+                  <input type="checkbox" checked={(settings.sales_rules_enabled ?? '1') === '1'} onChange={e => set('sales_rules_enabled', e.target.checked ? '1' : '0')} />
+                  <span className="toggle-slider" />
+                </label>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {[
+                  { key: 'sales_free_calls',      label: 'Free discovery calls before a paid pathway', ph: '1' },
+                  { key: 'sales_max_premeetings', label: 'Maximum meetings before a proposal', ph: '3' },
+                ].map(({ key, label, ph }) => (
+                  <div className="form-group" key={key}>
+                    <label className="form-label">{label}</label>
+                    <input type="number" min="0" className="form-input" placeholder={ph} value={settings[key] ?? ''} onChange={e => set(key, e.target.value)} />
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: 12, color: '#4A4949', marginTop: 10, marginBottom: 0 }}>
+                Strategic prospects get one extra relationship call when a defined deal is recorded. Government, embassy and anchor-referral partners are exempt. Set the prospect type on a service request.
+              </p>
+            </div>
+            <div className="advisor-legal-cards">
+              <h3 style={{ fontSize: 16, fontFamily: 'var(--font-h)', fontWeight: 600, marginBottom: 10, color : "#000" }}>Proposals & Fit</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {[
+                  { key: 'proposal_valid_min_days',  label: 'Proposal validity — minimum days', ph: '15' },
+                  { key: 'proposal_valid_max_days',  label: 'Proposal validity — maximum days', ph: '30' },
+                  { key: 'sales_nurture_months',     label: 'Nurture period (months)', ph: '6' },
+                  { key: 'sales_min_project_budget', label: 'Minimum project budget (USD)', ph: '5000' },
+                ].map(({ key, label, ph }) => (
+                  <div className="form-group" key={key}>
+                    <label className="form-label">{label}</label>
+                    <input type="number" min="0" className="form-input" placeholder={ph} value={settings[key] ?? ''} onChange={e => set(key, e.target.value)} />
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: 12, color: '#4A4949', marginTop: 10, marginBottom: 0 }}>
+                Requests below the minimum budget, or without a documents commitment, are flagged so you can refer or nurture instead of starting unpaid work.
+              </p>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'access' && (
           <div style={{display : "grid", gridTemplateColumns : "1fr"}}>
             <div className="advisor-legal-cards">

@@ -37,6 +37,19 @@ exports.cancelRequest = async (req, res) =>
 exports.adminRequests = async (req, res) =>
   sendList(res, await rpc('api_admin_service_requests', { p: req.query }, req.userId));
 
+/* ── Sales rules ── */
+exports.mySalesStatus = async (req, res) => send(res, await rpc('api_my_sales_status', {}, req.userId));
+
+exports.adminSalesProfile = async (req, res) =>
+  send(res, await rpc('api_admin_sales_profile', { p_user_id: req.params.userId }, req.userId));
+
+exports.adminSetProspect = async (req, res) =>
+  send(res, await rpc('api_admin_set_prospect', { p_user_id: req.params.userId, p: req.body }, req.userId));
+
+// Fit discipline: nurture (for the configured months) or refer out
+exports.adminRequestAction = async (req, res) =>
+  send(res, await rpc('api_admin_request_action', { p_id: req.params.id, p: req.body }, req.userId));
+
 exports.adminUpdateRequest = async (req, res) =>
   send(res, await rpc('api_admin_update_service_request', { p_id: req.params.id, p: req.body }, req.userId));
 

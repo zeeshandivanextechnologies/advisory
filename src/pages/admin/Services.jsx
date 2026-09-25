@@ -3,12 +3,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
 import { Badge, Spinner, EmptyState, SearchInput, Pagination, Modal, showToast } from '../../components/common/index';
-import { serviceAPI, adminAPI, intakeAPI, journeyAPI } from '../../services/api';
+import { serviceAPI, adminAPI, intakeAPI, journeyAPI, salesAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { LogHoursModal, RetainerLogModal } from '../../components/services/RetainerModals';
 import {
   priceLabel, money, hours, fmtDate, CATEGORY_LABELS, PRICING_MODELS, REQUEST_STATUSES, OPEN_REQUEST,
-  linesToList, listToLines,
+  linesToList, listToLines, PROSPECT_TYPES,
 } from '../../utils/services';
 
 const statusText = (s) => REQUEST_STATUSES.find(x => x.value === s)?.label || s;
@@ -29,6 +29,8 @@ const Footer = ({ onCancel, onSave, saving, label = 'Save' }) => (
 function RequestsTab({ onRetainerCreated }) {
   const navigate              = useNavigate();
   const [intake, setIntake]   = useState(null);
+  const [sales, setSales]     = useState(null);
+  const [actionNote, setActionNote] = useState('');
   const [rows, setRows]       = useState([]);
   const [meta, setMeta]       = useState({ total: 0, page: 1, limit: 20 });
   const [status, setStatus]   = useState('');
@@ -50,11 +52,38 @@ function RequestsTab({ onRetainerCreated }) {
   // Show the client's pre-call intake next to the request
   useEffect(() => {
     setIntake(null);
-    if (edit?.user_id) intakeAPI.get(edit.user_id).then(r => setIntake(r.data.data || false)).catch(() => setIntake(false));
+    setSales(null);
+    setActionNote('');
+    if (edit?.user_id) {
+      intakeAPI.get(edit.user_id).then(r => setIntake(r.data.data || false)).catch(() => setIntake(false));
+      salesAPI.adminGetProfile(edit.user_id).then(r => setSales(r.data.data)).catch(() => {});
+    }
   }, [edit?.user_id]);
+
+  const saveProspect = async (patch) => {
+    try {
+      const r = await salesAPI.adminSetProspect(edit.user_id, patch);
+      setSales(r.data.data);
+      showToast('Prospect profile saved');
+    } catch (err) { showToast(err.response?.data?.message || 'Save failed', 'error'); }
+  };
+
+  // Fit discipline: nurture for the configured period, or refer out
+  const requestAction = async (action) => {
+    setSaving(true);
+    try {
+      await serviceAPI.adminRequestAction(edit.id, { action, note: actionNote });
+      showToast(action === 'nurture' ? 'Moved to nurture' : 'Client referred');
+      setEdit(null);
+      load(meta.page);
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Action failed', 'error');
+    } finally { setSaving(false); }
+  };
 
   // Step 5: draft a proposal pre-filled from the request and its service
   const createProposal = async () => {
+    if (edit.fit_ok === false && !window.confirm(`This request is below the fit threshold (${(edit.fit_reasons || []).join('; ')}). Create a proposal anyway?`)) return;
     setSaving(true);
     try {
       const r = await journeyAPI.adminSaveProposal(null, { request_id: edit.id, amount: edit.quoted_amount || '' });
@@ -106,20 +135,21 @@ function RequestsTab({ onRetainerCreated }) {
         {loading ? <Spinner /> : (
           <div className="table-responsive">
             <table className="table billing-table align-middle mb-0 ai-case-table">
-              <thead><tr><th>Client</th><th>Service</th><th>Budget</th><th>Quote</th><th>Received</th><th>Status</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Client</th><th>Service</th><th>Budget</th><th>Fit</th><th>Quote</th><th>Received</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody>
                 {rows.length ? rows.map(r => (
                   <tr key={r.id}>
                     <td><div className="plan-table-content"><h5>{r.client_name}</h5><p>{r.client_email}</p></div></td>
                     <td><div className="plan-table-content"><h5>{r.offering_name}</h5><p>{CATEGORY_LABELS[r.category]}</p></div></td>
                     <td>{r.budget || '—'}</td>
+                    <td>{r.fit_applies ? <Badge status={r.fit_ok ? 'approved' : 'pending'} text={r.fit_ok ? 'OK' : 'Below threshold'} /> : '—'}</td>
                     <td>{r.quoted_amount ? money(r.quoted_amount, r.currency) : '—'}</td>
                     <td>{fmtDate(r.created_at)}</td>
                     <td><Badge status={r.status} text={statusText(r.status)} /></td>
                     <td><button className="thm-btn" onClick={() => setEdit({ ...r })}>Manage</button></td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={7}><EmptyState icon={<FiInbox />} title="No requests" text="Service requests from clients appear here" /></td></tr>
+                  <tr><td colSpan={8}><EmptyState icon={<FiInbox />} title="No requests" text="Service requests from clients appear here" /></td></tr>
                 )}
               </tbody>
             </table>
@@ -142,9 +172,20 @@ function RequestsTab({ onRetainerCreated }) {
                 <p style={{ fontSize: 13, color: '#4A4949', whiteSpace: 'pre-wrap', marginBottom: 0 }}>{edit.message}</p>
               </div>
             )}
+            {edit.fit_applies && (
+              <div className="col-12">
+                <div style={{ background: edit.fit_ok ? '#22C55E1F' : '#F59E0B1F', border: `0.9px solid ${edit.fit_ok ? '#22C55E' : '#F59E0B'}`, borderRadius: 'var(--radius)', padding: '10px 12px', fontSize: 12, color: edit.fit_ok ? '#166534' : '#92400E' }}>
+                  {edit.fit_ok
+                    ? `Fit check passed${edit.documents_committed ? ' · documents committed' : ''}.`
+                    : `Below fit threshold: ${(edit.fit_reasons || []).join('; ')}. ${edit.fit_advice}.`}
+                </div>
+              </div>
+            )}
+            {edit.status === 'nurture' && <div className="col-12" style={{ fontSize: 12, color: '#4A4949' }}>In nurture until <b>{fmtDate(edit.nurture_until)}</b>.</div>}
+            {edit.status === 'referred' && <div className="col-12" style={{ fontSize: 12, color: '#4A4949' }}>Referred to: <b>{edit.referral_note}</b></div>}
             <Field label="Status" col={6}>
               <select className="form-select" value={edit.status} onChange={e => setEdit(p => ({ ...p, status: e.target.value }))}>
-                {REQUEST_STATUSES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                {REQUEST_STATUSES.filter(s => !['nurture', 'referred'].includes(s.value) || s.value === edit.status).map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </Field>
             <Field label={`Quoted amount (${edit.currency || 'USD'})`} col={6}>
@@ -167,9 +208,37 @@ function RequestsTab({ onRetainerCreated }) {
                 </div>
               ) : <p style={{ fontSize: 12, color: 'var(--orange)', marginBottom: 0 }}>Intake not completed yet.</p>}
             </div>
+            {sales && (
+              <div className="col-12">
+                <label className="form-label">Prospect profile (meeting rules)</label>
+                <p style={{ fontSize: 12, color: '#4A4949', marginBottom: 6 }}>
+                  {sales.meetings} meeting{sales.meetings === 1 ? '' : 's'} so far · {sales.paid_pathway ? 'paid pathway' : `free calls: ${sales.free_calls_limit}`} · {sales.proposal_stage ? 'proposal sent' : `max ${sales.max_premeetings} before proposal`}
+                  {sales.exempt ? ' · exempt from limits' : ''}{sales.can_book ? '' : ' · booking blocked'}
+                </p>
+                <div className="row g-2">
+                  <div className="col-md-6">
+                    <select className="form-select" value={sales.prospect_type} onChange={e => saveProspect({ prospect_type: e.target.value })}>
+                      {PROSPECT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                    </select>
+                  </div>
+                  {sales.prospect_type === 'strategic' && (
+                    <div className="col-md-6">
+                      <input className="form-input" placeholder="Defined deal (enables +1 relationship call)" defaultValue={sales.relationship_deal || ''}
+                        onBlur={e => e.target.value !== (sales.relationship_deal || '') && saveProspect({ relationship_deal: e.target.value })} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             {OPEN_REQUEST.includes(edit.status) && (
               <div className="col-12">
-                <button className="thm-btn" disabled={saving} onClick={createProposal}>Create Proposal / SOW</button>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <button className="thm-btn" disabled={saving} onClick={createProposal}>Create Proposal / SOW</button>
+                  <button className="ai-thm-btn outline" disabled={saving} onClick={() => requestAction('nurture')}>Move to Nurture</button>
+                  <button className="ai-thm-btn outline" disabled={saving} onClick={() => requestAction('refer')}>Refer Out</button>
+                </div>
+                <input className="form-input" style={{ marginTop: 8 }} placeholder="Note — who you refer to, or why you nurture"
+                  value={actionNote} onChange={e => setActionNote(e.target.value)} />
               </div>
             )}
             {edit.offering_slug === 'executive-advisory-retainer' && OPEN_REQUEST.includes(edit.status) && (

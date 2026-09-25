@@ -183,7 +183,15 @@ export const serviceAPI = {
   adminSaveOffering:  (id, data)     => id ? api.put(`/admin/services/offerings/${id}`, data) : api.post('/admin/services/offerings', data),
   adminGetRequests:   (p)            => api.get('/admin/services/requests', { params: p }),
   adminUpdateRequest: (id, data)     => api.put(`/admin/services/requests/${id}`, data),
+  adminRequestAction: (id, data)     => api.post(`/admin/services/requests/${id}/action`, data),
   adminSaveRetainer:  (id, data)     => id ? api.put(`/admin/retainers/${id}`, data) : api.post('/admin/retainers', data),
+};
+
+/* ── Sales rules: meeting limits, prospect profile ──────────── */
+export const salesAPI = {
+  getMyStatus:      ()             => api.get('/sales/status'),
+  adminGetProfile:  (userId)       => api.get(`/admin/sales/${userId}`),
+  adminSetProspect: (userId, data) => api.put(`/admin/sales/${userId}`, data),
 };
 
 /* ── Community: memberships, events, market briefs ─────────── */

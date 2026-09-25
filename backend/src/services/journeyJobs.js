@@ -16,6 +16,9 @@ const INTERVAL_MS = 60 * 60 * 1000;
 const runOnce = async () => {
   const { rows } = await pool.query('select public._run_journey_jobs() as r');
   const r = rows[0].r;
+  // Sales rules: expired proposals → nurture, and close nurture periods that ended
+  const { rows: [sales] } = await pool.query('select public._run_sales_jobs() as r');
+  r.sales = sales.r;
 
   for (const i of r.invoice_reminders || []) {
     sendMailSafe({ to: i.email, ...mail.invoiceReminder({

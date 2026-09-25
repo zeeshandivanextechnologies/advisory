@@ -43,7 +43,27 @@ export const REQUEST_STATUSES = [
   { value: 'won',           label: 'Won' },
   { value: 'declined',      label: 'Declined' },
   { value: 'cancelled',     label: 'Cancelled' },
+  { value: 'nurture',       label: 'Nurture' },
+  { value: 'referred',      label: 'Referred' },
 ];
+
+// Sales rules: budget ranges (budget_min drives the $5,000 fit check)
+export const BUDGET_RANGES = [
+  { label: 'Under $5,000',        min: 0 },
+  { label: '$5,000 – $15,000',    min: 5000 },
+  { label: '$15,000 – $30,000',   min: 15000 },
+  { label: 'Over $30,000',        min: 30000 },
+  { label: 'Not sure yet',        min: null },
+];
+export const PROSPECT_TYPES = [
+  { value: 'standard',       label: 'Standard' },
+  { value: 'strategic',      label: 'Strategic prospect (+1 relationship call with a defined deal)' },
+  { value: 'government',     label: 'Government (no meeting limits)' },
+  { value: 'embassy',        label: 'Embassy (no meeting limits)' },
+  { value: 'anchor_partner', label: 'Anchor-referral partner (no meeting limits)' },
+];
+// Project offerings are subject to the minimum-budget fit check
+export const isProjectOffering = (o) => ['fixed', 'starting_at', 'range'].includes(o?.pricing_model) && o?.slug !== 'executive-discovery-sessions';
 
 export const OPEN_REQUEST = ['new', 'in_review', 'proposal_sent'];
 

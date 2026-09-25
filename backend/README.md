@@ -40,7 +40,8 @@ backend/
     │   ├── 0003_auth_codes.sql
     │   ├── 0004_pending_features.sql
     │   ├── 0005_services_catalog.sql
-    │   └── 0006_client_journey_engagements.sql
+    │   ├── 0006_client_journey_engagements.sql
+    │   └── 0007_sales_rules.sql
     ├── templates/            auth emails (6-digit signup code, password reset)
     └── seed.sql
 ```
@@ -158,6 +159,14 @@ When Admin → Settings → Maintenance Mode is on:
 - Invoices are paid either by the admin recording a payment or online through Stripe, when the gateway is Stripe.
 - Every payment is also written to `payments`, so Revenue includes it.
 - Jobs run hourly. Set `JOURNEY_JOBS=false` to turn them off.
+
+### Sales rules (migration `0007`)
+All limits are in Admin → Settings → Sales Rules and are enforced by the database when a client books.
+
+- **Free calls:** one free discovery call (`sales_free_calls`) until the client has a paid pathway (a paid invoice, a retainer or an accepted proposal). A **strategic** prospect with a recorded *defined deal* gets one extra relationship call.
+- **Pre-close meetings:** at most three meetings (`sales_max_premeetings`) before a proposal is sent. **Government**, **embassy** and **anchor-referral partners** are exempt. Set the prospect type on a service request.
+- **Proposal shelf life:** 15–30 days (`proposal_valid_min_days` / `proposal_valid_max_days`). An expired proposal moves its request to **nurture** for `sales_nurture_months` (6); after that the request closes automatically. Leads in nurture work the same way.
+- **Fit discipline:** a request for a project offering records a budget range and a documents commitment. It is flagged when the budget is below `sales_min_project_budget` ($5,000) or documents can't be committed, and the admin can **Move to Nurture** or **Refer Out**.
 
 ### Endpoints (all under `/api`)
 Every response is `{ success, data }` (lists add `meta`) or `{ success:false, message }`. Protected endpoints need `Authorization: Bearer <token>`.
