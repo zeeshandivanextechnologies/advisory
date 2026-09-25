@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '../../components/layout/AppHeader';
-import { Spinner, EmptyState } from '../../components/common/index';
+import { Spinner, EmptyState, showToast } from '../../components/common/index';
+import { useSettings } from '../../context/SettingsContext';
 import { advisorAPI } from '../../services/api';
 import { FaHistory, FaSearch } from 'react-icons/fa';
 import { FaCalendar, FaPlus, FaUser } from 'react-icons/fa6';
@@ -26,14 +27,22 @@ export default function ConnectAdvisor() {
   const [search,   setSearch]       = useState('');
   const [category, setCategory]     = useState('All');
   const [sort,     setSort]         = useState('Available');
+  const [query,    setQuery]        = useState('');
+  const { currency }                = useSettings();
+
+  // Wait until typing pauses before searching
+  useEffect(() => {
+    const t = setTimeout(() => setQuery(search.trim()), 300);
+    return () => clearTimeout(t);
+  }, [search]);
 
   const load = useCallback(() => {
     setLoading(true);
-    advisorAPI.list({ search, limit: 20 })
+    advisorAPI.list({ search: query, limit: 100 })
       .then(r => setAdvisors(r.data.data || []))
-      .catch(console.error)
+      .catch(() => showToast('Failed to load advisors', 'error'))
       .finally(() => setLoading(false));
-  }, [search]);
+  }, [query]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -67,6 +76,14 @@ export default function ConnectAdvisor() {
     'Response Time': (x, y) => byAvailability(x, y) || byRating(x, y),
   };
   const visibleAdvisors = advisors.filter(inCategory).sort(sorters[sort] || sorters.Available);
+
+  // Headline from the advisor's own profile (no placeholder titles)
+  const headline = (a, specs) => {
+    const parts = [];
+    if (specs.length) parts.push(specs.slice(0, 2).join(' · '));
+    if (Number(a.experience_yrs) > 0) parts.push(`${a.experience_yrs} yr${Number(a.experience_yrs) === 1 ? '' : 's'} experience`);
+    return parts.join(' · ') || 'Advisory specialist';
+  };
 
   return (
     <>
@@ -180,7 +197,7 @@ export default function ConnectAdvisor() {
               const initials  = getInitials(a.full_name);
 
               return (
-                <>
+                <React.Fragment key={a.id}>
                 {/* <div className='col-lg-6 col-md-6 col-12'
                   key={a.id}
                   
@@ -268,7 +285,7 @@ export default function ConnectAdvisor() {
                   </div>
                 </div> */}
 
-                <div className="col-lg-6 col-md-6 col-sm-12 mb-3" key={a.id}>
+                <div className="col-lg-6 col-md-6 col-sm-12 mb-3">
   <div
     className="professional-card"
     onMouseEnter={e => e.currentTarget.classList.add('hover')}
@@ -292,47 +309,47 @@ export default function ConnectAdvisor() {
         <h4>{a.full_name}</h4>
       </div>
       <div className="pro-title">
-        <p>
-          Senior Corporate Lawyer · QFC Specialist · {a.experience_yrs || 14} year
-        </p>
+        <p>{headline(a, specs)}</p>
       </div>
     </div>
 
-  
+
     <div className="pro-cases">
       <ul className="pro-lists">
-        {(specs.length ? specs : ['Incorporation', 'QFC Law', 'M&A'])
-          .slice(0, 3)
-          .map((s, i) => (
-            <li key={i} className="pro-items">
-              <span className="pro-names">{s}</span>
-            </li>
-          ))}
+        {specs.length ? specs.slice(0, 3).map((s, i) => (
+          <li key={i} className="pro-items">
+            <span className="pro-names">{s}</span>
+          </li>
+        )) : (
+          <li className="pro-items"><span className="pro-names">General advisory</span></li>
+        )}
       </ul>
     </div>
 
 
     <div className="pro-stats">
       <div>
-        <h6>{Number(a.rating || 4.9).toFixed(1)}</h6>
+        <h6>{a.rating ? Number(a.rating).toFixed(1) : 'New'}</h6>
         <p>Rating</p>
       </div>
 
       <div>
-        <h6>{a.total_clients || 127}</h6>
-        <p>Cases</p>
+        <h6>{a.total_clients || 0}</h6>
+        <p>Clients</p>
       </div>
 
       <div>
-        <h6>2h</h6>
-        <p>Response</p>
+        <h6>{Number(a.hourly_rate) > 0 ? `${currency} ${Number(a.hourly_rate).toLocaleString()}` : '—'}</h6>
+        <p>Per hour</p>
       </div>
     </div>
 
     <button
       onClick={() =>
-        navigate('/user/book-consultation', { state: { advisor: a } })
+        available && navigate('/user/book-consultation', { state: { advisor: a } })
       }
+      disabled={!available}
+      title={available ? '' : 'This advisor is not accepting bookings right now'}
       className={`pro-btn ${
         available ? 'thm-btn' : 'thm-btn outline'
       }`}
@@ -343,7 +360,7 @@ export default function ConnectAdvisor() {
         </>
       ) : (
         <>
-          <FaCalendar /> Schedule Session
+          <FaCalendar /> Not Accepting Bookings
         </>
       )}
     </button>
@@ -351,7 +368,7 @@ export default function ConnectAdvisor() {
 </div>
 
                 
-                </>
+                </React.Fragment>
               );
             })}
             
