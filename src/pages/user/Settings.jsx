@@ -15,6 +15,7 @@ const NOTIF_PREFS = [
   { key: 'document_updates',     label: 'Document review updates',       desc: 'When consultant reviews your docs' },
   { key: 'billing_notifs',       label: 'Billing notifications',         desc: 'Receipts and renewal reminders' },
   { key: 'consultant_messages',  label: 'Consultant messages',           desc: 'New notes or messages' },
+  { key: 'whatsapp_notifs',      label: 'WhatsApp notifications',        desc: 'Session reminders, proposals, invoices and deliverables on WhatsApp — sent to the phone number in your profile', optIn: true },
 ];
 
 /* ── Profile Tab ──────────────────────────────────────────── */
@@ -351,7 +352,7 @@ function PlanTab() {
 /* ── Notification Tab ─────────────────────────────────────── */
 function NotificationTab() {
   const [prefs, setPrefs] = useState(
-    Object.fromEntries(NOTIF_PREFS.map(p => [p.key, true]))
+    Object.fromEntries(NOTIF_PREFS.map(p => [p.key, !p.optIn]))
   );
 
   useEffect(() => {

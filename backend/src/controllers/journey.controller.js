@@ -5,6 +5,7 @@ const { sendMailSafe } = require('../services/mailer');
 const { wantsEmail, contactFor } = require('../services/prefs');
 const payments = require('../services/payments');
 const mail = require('../services/journeyEmails');
+const wa = require('../services/whatsapp');
 
 const adminEmails = async () => {
   const { rows } = await pool.query(`select email, full_name from public.profiles where role = 'admin' and is_active`);
@@ -39,6 +40,9 @@ const emailInvoice = async (inv, title) => {
     sendMailSafe({ to: who.email, ...mail.invoiceIssued({
       name: who.full_name, title, invoiceNo: inv.invoice_no, kind: inv.kind, amount: inv.amount, currency: inv.currency, dueDate: inv.due_date,
     }) });
+    wa.sendWhatsAppSafe({ email: who.email, template: 'invoice_issued', params: {
+      name: who.full_name, invoice_no: inv.invoice_no, amount: wa.fmtMoney(inv.amount, inv.currency), due: wa.fmtDate(inv.due_date),
+    } });
   }
 };
 
@@ -57,6 +61,9 @@ exports.adminSendProposal = async (req, res) => {
   sendMailSafe({ to: pr.client_email, ...mail.proposalSent({
     name: pr.client_name, title: pr.title, amount: pr.amount, currency: pr.currency, validUntil: pr.valid_until,
   }) });
+  wa.sendWhatsAppSafe({ email: pr.client_email, template: 'proposal_sent', params: {
+    name: pr.client_name, title: pr.title, valid_until: wa.fmtDate(pr.valid_until),
+  } });
 };
 
 exports.adminWithdrawProposal = async (req, res) =>

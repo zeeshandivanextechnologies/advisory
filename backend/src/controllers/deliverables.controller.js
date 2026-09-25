@@ -5,6 +5,7 @@ const { send } = require('../utils/http');
 const HttpError = require('../utils/HttpError');
 const { sendMailSafe } = require('../services/mailer');
 const mail = require('../services/journeyEmails');
+const wa = require('../services/whatsapp');
 
 /* QA checklist before any deliverable goes out: draft → QA → approval → release */
 const BUCKET = 'documents';
@@ -53,7 +54,10 @@ exports.action = async (req, res) => {
       const { rows: [c] } = await pool.query(
         `select u.email, u.full_name, e.title from public.engagements e join public.profiles u on u.id = e.user_id where e.id = $1`,
         [d.engagement_id]);
-      if (c) sendMailSafe({ to: c.email, ...mail.deliverableReleased({ name: c.full_name, engagement: c.title, title: d.title }) });
+      if (c) {
+        sendMailSafe({ to: c.email, ...mail.deliverableReleased({ name: c.full_name, engagement: c.title, title: d.title }) });
+        wa.sendWhatsAppSafe({ email: c.email, template: 'deliverable_released', params: { name: c.full_name, title: d.title, engagement: c.title } });
+      }
     })().catch((err) => console.error('[mail] deliverable release email failed:', err.message));
   }
 };

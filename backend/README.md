@@ -44,7 +44,8 @@ backend/
     │   ├── 0007_sales_rules.sql
     │   ├── 0008_staffing_ai.sql
     │   ├── 0009_deliverable_qa.sql
-    │   └── 0010_partners.sql
+    │   ├── 0010_partners.sql
+    │   └── 0011_whatsapp_prefs.sql
     ├── templates/            auth emails (6-digit signup code, password reset)
     └── seed.sql
 ```
@@ -115,6 +116,26 @@ Users manage these under Settings → Notifications (`GET|PUT /users/notificatio
 | `billing_notifs` | Payment receipts |
 | `consultant_messages` | Case status updates, and session notes / action items |
 | `compliance_reminders` | Saved for later; there are no compliance deadlines yet |
+| `whatsapp_notifs` | **Opt-in, off by default.** WhatsApp copies of session reminders, proposals, invoices, invoice reminders, released deliverables and referral consent requests. Needs a phone number in the profile |
+
+### WhatsApp (Meta WhatsApp Cloud API)
+WhatsApp messages go out next to the matching emails, only to users who switched on *WhatsApp notifications* and saved a phone number. Numbers saved without a country code get `WHATSAPP_DEFAULT_COUNTRY_CODE` (974). Without `WHATSAPP_TOKEN`, messages are printed to the console, the same way emails are in development.
+
+Setup:
+1. In Meta for Developers, create an app with the WhatsApp product. Add and verify your business phone number.
+2. Set `WHATSAPP_PHONE_NUMBER_ID` (WhatsApp → API Setup). Set `WHATSAPP_TOKEN` to a **permanent System User token** with `whatsapp_business_messaging`. The temporary 24-hour token is only for testing.
+3. In WhatsApp Manager → Message templates, create these templates (category **Utility**, language English `en`). The names must match; to use other names, set `WHATSAPP_TPL_<NAME>`, e.g. `WHATSAPP_TPL_INVOICE_ISSUED=my_invoice`.
+
+| Template name | Body (variables in this order) |
+|---|---|
+| `session_reminder` | Hi {{1}}, your session with {{2}} starts at {{3}}. Join from your dashboard. |
+| `proposal_sent` | Hi {{1}}, your proposal for {{2}} is ready and valid until {{3}}. Review it in your dashboard. |
+| `invoice_issued` | Hi {{1}}, invoice {{2}} for {{3}} has been issued and is due on {{4}}. |
+| `invoice_reminder` | Hi {{1}}, a reminder that invoice {{2}} for {{3}} is due on {{4}}. |
+| `deliverable_released` | Hi {{1}}, your deliverable "{{2}}" for {{3}} has passed our quality check and is ready. |
+| `referral_consent` | Hi {{1}}, we would like to introduce you to {{2}}. Please give or decline consent in your dashboard. |
+
+A failed WhatsApp send is logged and never affects the request or the email.
 
 ### Payments
 Admin → Settings → Payment gateway decides how plans are paid.
@@ -124,7 +145,13 @@ Admin → Settings → Payment gateway decides how plans are paid.
   1. `POST /subscriptions/purchase` creates a *pending* payment and returns `redirect_url` to Stripe Checkout.
   2. After the customer pays, Stripe calls `POST /payments/stripe/webhook`, and the return page calls `GET /payments/stripe/confirm`. Either one activates the plan; activation is idempotent.
   3. Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. To test locally, run `stripe listen --forward-to localhost:5000/api/payments/stripe/webhook`.
-- **tap**: not supported yet. Purchases return a clear error.
+- **tap** (Tap Payments: cards, Apple Pay, NAPS / Benefit / KNET / mada where enabled on your account):
+  1. `POST /subscriptions/purchase` creates a *pending* payment, opens a Tap charge (`source: src_all`) and returns `redirect_url` to the Tap payment page.
+  2. Tap sends the customer back to `/user/plans?checkout=success&tap_id=chg_…`, and the page calls `GET /payments/tap/confirm`. If `API_PUBLIC_URL` is set, Tap also calls `POST /payments/tap/webhook`.
+  3. In both cases the charge is **re-fetched from the Tap API**. Only `CAPTURED` activates the plan. Declined, cancelled and abandoned charges mark the payment failed. The webhook payload is never trusted.
+  4. Set `TAP_SECRET_KEY` (`sk_test_…` for testing, `sk_live_…` live) and `API_PUBLIC_URL`.
+
+Engagement invoices (deposit / final) are paid the same way with either gateway, from the client's Engagements page.
 
 Online payments need the Express backend. In Supabase-only mode, only `manual` works.
 
@@ -319,7 +346,29 @@ Other scripts:
 - `npm run db:new-migration <name>` creates a new migration file. Never edit a migration that has already been applied to production; add a new one instead.
 - `npm run db:stop` stops the local stack.
 
-## Deploying to the hosted project
+## Deploying to production
+Payments, emails, WhatsApp, session reminders and the hourly jobs all run in the Express API. So the live site should use the Express backend, with the database staying on Supabase.
+
+**1. Deploy the API.** `render.yaml` at the repo root is a Render Blueprint (Dashboard → New → Blueprint). Any Node 20+ host works: Railway, a VPS with pm2, etc. Settings: root `backend`, build `npm ci --omit=dev`, start `npm start`, health check `/api/health`.
+- Use an always-on instance. Free instances sleep, and reminders / jobs stop while they sleep.
+- `DATABASE_URL`: use Supabase → Connect → **Session pooler**. The direct `db.<ref>.supabase.co` host is IPv6-only, and most hosts can't reach it.
+- Set `FRONTEND_URL` and `CORS_ORIGINS` to the live site URL, and `API_PUBLIC_URL` to the API's own URL.
+- Copy the other values from `backend/.env`: Supabase keys, SMTP, Stripe/Tap, WhatsApp. Use a new random `JWT_SECRET` in production.
+
+**2. Point the live frontend at it.** In `.env.production`, set these two lines, then rebuild and deploy the frontend:
+```
+REACT_APP_BACKEND=express
+REACT_APP_API_URL=https://<your-api-host>/api
+```
+Keep `REACT_APP_BACKEND=supabase` until the API is live. Switching earlier makes the live site call a server that doesn't exist.
+
+**3. Payment webhooks.**
+- Stripe: Developers → Webhooks, endpoint `https://<api>/api/payments/stripe/webhook`, events `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`. Put the signing secret in `STRIPE_WEBHOOK_SECRET`.
+- Tap: nothing to register. The webhook URL is sent with each charge, from `API_PUBLIC_URL`.
+
+Then choose the gateway in Admin → Settings → Payment Gateway.
+
+## Deploying database migrations
 Hosted project ref: `dtiyvsaugifxgvekuiuv`.
 
 ```bash
@@ -335,7 +384,7 @@ npx supabase migration repair --status applied 0001 0002 --linked
 ```
 
 ### One-time hosted dashboard setup
-`config.toml` only affects the local stack. On the hosted project, set these in the dashboard:
+`config.toml` only affects the local stack. On the hosted project, set these in the dashboard. They are required while the live site runs in Supabase mode, where Supabase sends the signup codes and reset links. They are still recommended with the Express backend.
 1. **Authentication → Emails → "Confirm signup":** include `{{ .Token }}`. You can copy `templates/confirmation.html`.
 2. **Authentication → Providers → Email:** keep "Confirm email" enabled.
 3. **Authentication → URL Configuration:** set the Site URL to the live domain. Add `http://localhost:3000/**` and `https://<your-domain>/**` to Redirect URLs.
@@ -353,4 +402,4 @@ The `delete` is only needed if the account registered as an advisor.
 
 ## Notes
 - New advisors start as `pending` and are hidden from clients until an admin approves them.
-- `payment_gateway = manual` activates plans immediately. Add a Stripe/Tap Edge Function (`supabase/functions/`) before charging real customers.
+- `payment_gateway = manual` activates plans immediately. Switch to Stripe or Tap (Express backend) before charging real customers.

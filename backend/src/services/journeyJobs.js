@@ -2,6 +2,7 @@ const { pool } = require('../config/db');
 const { sendMailSafe } = require('./mailer');
 const { wantsEmail } = require('./prefs');
 const mail = require('./journeyEmails');
+const wa = require('./whatsapp');
 
 /*
  * Hourly client-journey jobs (each item is claimed once in the database):
@@ -27,6 +28,9 @@ const runOnce = async () => {
     sendMailSafe({ to: i.email, ...mail.invoiceReminder({
       name: i.name, title: i.title, invoiceNo: i.invoice_no, amount: i.amount, currency: i.currency, dueDate: i.due_date, day: i.day,
     }) });
+    wa.sendWhatsAppSafe({ email: i.email, template: 'invoice_reminder', params: {
+      name: i.name, invoice_no: i.invoice_no, amount: wa.fmtMoney(i.amount, i.currency), due: wa.fmtDate(i.due_date),
+    } });
   }
   for (const f of r.followups || []) {
     sendMailSafe({ to: f.email, ...mail.followUp({ name: f.name, title: f.title, kind: f.kind, day: f.day }) });

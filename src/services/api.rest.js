@@ -163,6 +163,8 @@ export const subscriptionAPI = {
   adminDeletePlan: (id)    => api.delete(`/subscriptions/admin/plans/${id}`),
   // After returning from Stripe Checkout (?session_id=...)
   confirmCheckout: (sessionId) => api.get('/payments/stripe/confirm', { params: { session_id: sessionId } }),
+  // After returning from the Tap payment page (?tap_id=chg_...)
+  confirmTap:      (tapId)     => api.get('/payments/tap/confirm', { params: { tap_id: tapId } }),
 };
 
 export const paymentAPI = {

@@ -42,12 +42,18 @@ export default function Engagements() {
     const params = new URLSearchParams(window.location.search);
     const checkout = params.get('checkout');
     const sessionId = params.get('session_id');
+    const tapId = params.get('tap_id');
     if (!checkout) return;
     window.history.replaceState(null, '', window.location.pathname);
     if (checkout === 'cancelled') { showToast('Payment was cancelled', 'error'); return; }
-    if (sessionId) {
-      subscriptionAPI.confirmCheckout(sessionId)
-        .then(r => { showToast(r.data.data?.status === 'paid' ? 'Payment received — thank you!' : 'Your payment is processing'); load(); })
+    if (sessionId || tapId) {
+      (tapId ? subscriptionAPI.confirmTap(tapId) : subscriptionAPI.confirmCheckout(sessionId))
+        .then(r => {
+          const d = r.data.data || {};
+          if (d.failed) showToast('The payment was not completed', 'error');
+          else showToast(d.status === 'paid' ? 'Payment received — thank you!' : 'Your payment is processing');
+          load();
+        })
         .catch(err => showToast(err.response?.data?.message || 'Could not confirm the payment', 'error'));
     }
   }, [load]);

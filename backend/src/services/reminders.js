@@ -1,4 +1,5 @@
 const { pool } = require('../config/db');
+const wa = require('./whatsapp');
 const { sendMailSafe } = require('./mailer');
 const tpl = require('./emailTemplates');
 
@@ -15,9 +16,11 @@ const runOnce = async () => {
     const common = { when: s.scheduled_at, duration: s.duration_min, medium: s.medium };
     if (s.client_wants_email) {
       sendMailSafe({ to: s.client_email, ...tpl.sessionReminder({ ...common, name: s.client_name, withName: s.advisor_name, link: '/user/consultations' }) });
+      wa.sendWhatsAppSafe({ email: s.client_email, template: 'session_reminder', params: { name: s.client_name, with: s.advisor_name, when: wa.fmtDateTime(s.scheduled_at) } });
     }
     if (s.advisor_wants_email) {
       sendMailSafe({ to: s.advisor_email, ...tpl.sessionReminder({ ...common, name: s.advisor_name, withName: s.client_name, link: '/advisor/schedule' }) });
+      wa.sendWhatsAppSafe({ email: s.advisor_email, template: 'session_reminder', params: { name: s.advisor_name, with: s.client_name, when: wa.fmtDateTime(s.scheduled_at) } });
     }
   }
   return rows[0].r?.length || 0;

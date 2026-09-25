@@ -26,6 +26,7 @@ router.get('/health', (req, res) => res.json({ success: true, status: 'ok' }));
 router.get('/settings', h(misc.publicSettings));
 router.post('/contact', h(misc.contact));
 router.post('/payments/stripe/webhook', h(misc.stripeWebhook)); // raw body, see app.js
+router.post('/payments/tap/webhook', h(misc.tapWebhook));
 router.get('/subscriptions/plans', h(misc.plans));
 router.get('/services/catalog', h(services.catalog));
 
@@ -97,6 +98,7 @@ router.put('/subscriptions/admin/plans/:id', h(misc.adminUpdatePlan));
 router.delete('/subscriptions/admin/plans/:id', h(misc.adminDeletePlan));
 router.get('/payments', h(misc.payments));
 router.get('/payments/stripe/confirm', h(misc.confirmCheckout));
+router.get('/payments/tap/confirm', h(misc.confirmTap));
 
 /* ── Services, retainers, community ─────────────────────── */
 router.post('/services/requests', h(services.requestService));

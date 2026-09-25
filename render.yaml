@@ -1,0 +1,59 @@
+# Render Blueprint for the Express API (backend/). Dashboard → New → Blueprint → this repo.
+# Secrets are marked `sync: false`: Render asks for them on first deploy (never commit them).
+# See backend/README.md → "Deploying to production".
+services:
+  - type: web
+    name: aunadvisory-api
+    runtime: node
+    rootDir: backend
+    plan: starter            # keep it always on: reminders and hourly jobs run in this process
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: FRONTEND_URL          # e.g. https://app.yourdomain.com
+        sync: false
+      - key: CORS_ORIGINS          # same as FRONTEND_URL (comma-separate extra origins)
+        sync: false
+      - key: API_PUBLIC_URL        # this service's URL, e.g. https://aunadvisory-api.onrender.com
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL          # Supabase → Connect → Session pooler (IPv4)
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: APP_NAME
+        value: AunAdvisory
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_SECURE
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: TAP_SECRET_KEY
+        sync: false
+      - key: WHATSAPP_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false

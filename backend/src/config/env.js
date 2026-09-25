@@ -23,6 +23,20 @@ module.exports = {
   // Online payments (used when Admin → Settings → Payment gateway = Stripe)
   stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+  // Tap Payments (Admin → Settings → Payment gateway = Tap)
+  tapSecretKey: process.env.TAP_SECRET_KEY || '',
+  // Public URL of this API (e.g. https://api.example.com), used for payment webhooks
+  apiPublicUrl: (process.env.API_PUBLIC_URL || '').replace(/\/$/, ''),
+
+  // WhatsApp Cloud API (Meta). Without a token, messages are printed to the console.
+  whatsapp: {
+    token: process.env.WHATSAPP_TOKEN || '',
+    phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
+    apiVersion: process.env.WHATSAPP_API_VERSION || 'v23.0',
+    language: process.env.WHATSAPP_TEMPLATE_LANG || 'en',
+    // Used for numbers saved without a country code (e.g. 5555 0000)
+    defaultCountryCode: (process.env.WHATSAPP_DEFAULT_COUNTRY_CODE || '974').replace(/\D/g, ''),
+  },
 
   // Session reminder emails, checked every minute
   remindersEnabled: process.env.SESSION_REMINDERS !== 'false',

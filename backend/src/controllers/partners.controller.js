@@ -2,6 +2,7 @@ const { rpc, pool } = require('../config/db');
 const { send } = require('../utils/http');
 const { sendMailSafe } = require('../services/mailer');
 const mail = require('../services/journeyEmails');
+const wa = require('../services/whatsapp');
 
 /*
  * Law firm / partner MOU workflow: partner profiles, MOUs, referral handoffs
@@ -38,7 +39,10 @@ exports.referrals = async (req, res) =>
 exports.createReferral = async (req, res) => {
   const r = await rpc('api_admin_create_referral', { p: req.body }, req.userId);
   send(res, r, 201);
-  if (r.status === 'awaiting_consent') emailClient(r.id, mail.referralConsent);
+  if (r.status === 'awaiting_consent') {
+    emailClient(r.id, mail.referralConsent);
+    wa.sendWhatsAppSafe({ email: r.client_email, template: 'referral_consent', params: { name: r.client_name, partner: r.partner_name } });
+  }
 };
 
 exports.updateReferral = async (req, res) => {

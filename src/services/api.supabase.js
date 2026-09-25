@@ -255,6 +255,7 @@ export const subscriptionAPI = {
   adminDeletePlan: (id)    => rpc('api_admin_delete_plan', { p_id: Number(id) }).then(ok),
   // Online checkout needs the Express server; nothing to confirm in serverless mode
   confirmCheckout: ()      => Promise.resolve(ok(null)),
+  confirmTap:      ()      => Promise.resolve(ok(null)),
 };
 
 export const paymentAPI = {

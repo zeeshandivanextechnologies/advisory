@@ -58,6 +58,16 @@ exports.payments = async (req, res) => send(res, await rpc('api_payments', {}, r
 exports.confirmCheckout = async (req, res) =>
   send(res, await payments.confirmSession(req.userId, String(req.query.session_id || '')));
 
+// Back from the Tap payment page: ?tap_id=chg_...
+exports.confirmTap = async (req, res) =>
+  send(res, await payments.confirmTapCharge(req.userId, String(req.query.tap_id || '')));
+
+// Tap -> us. Always answers 200; the charge is verified with the Tap API.
+exports.tapWebhook = async (req, res) => {
+  await payments.handleTapWebhook(req.body).catch((err) => console.error('[tap webhook]', err.message));
+  res.json({ received: true });
+};
+
 // Stripe -> us. Needs the raw body for signature verification (see app.js).
 exports.stripeWebhook = async (req, res) => {
   await payments.handleWebhook(req.body, req.headers['stripe-signature']);
